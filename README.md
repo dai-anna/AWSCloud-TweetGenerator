@@ -5,4 +5,5 @@ Team Members:
 
 - Deekshita Saikia
 - Anna Dai
-- Moritz WilkschT
+- Moritz Wilksch
+- Satvik Kishore
