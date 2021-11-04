@@ -11,5 +11,6 @@ source env/bin/activate
 make install
 ```
 
-
+## Project Architecture
+[INSERT ARCHITECTURE DIAGRAM]
 
