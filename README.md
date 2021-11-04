@@ -5,3 +5,11 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 ```bash
 python -m venv env
 source env/bin/activate
+```
+
+```bash
+make install
+```
+
+
+
