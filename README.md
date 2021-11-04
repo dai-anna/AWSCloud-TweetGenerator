@@ -8,3 +8,8 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 - Anna Dai
 - Moritz Wilksch
 - Satvik Kishore
+
+## Environment Setup
+```bash
+python -m venv env
+source env/bin/activate
