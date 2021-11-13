@@ -5,7 +5,7 @@ import numpy as np
 import boto3
 import os
 import joblib
-from helpers import build_proba_dict, get_pdist_from_proba_dict
+from train import build_proba_dict, get_pdist_from_proba_dict
 
 ROOT_DIR = "./"
 
@@ -18,7 +18,7 @@ s3 = boto3.resource(
 
 bucket = s3.Bucket("exp-noahgift")
 bucket.download_file("text-generator/proba_dict.joblib", f"{ROOT_DIR}artifacts/proba_dict.joblib")
-
+print("[INFO] Model downloaded from S3.")
 proba_dict = joblib.load(f"{ROOT_DIR}artifacts/proba_dict.joblib")
 
 
