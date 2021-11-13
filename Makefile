@@ -15,7 +15,6 @@ docker-run:
 
 docker-run-debug:
 	docker run -it --name datacollector -e API_TOKEN=${API_TOKEN} datacollector
-	docker cp datacollector:/app/twint_out.csv ~/AWSCloud-TweetGenerator/twint_out.csv
 	
 docker-clean:
 	docker rm -f datacollector

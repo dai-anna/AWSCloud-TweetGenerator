@@ -1,7 +1,8 @@
 import twint
 import datetime
-from gethashtags import trends_ls
+from gethashtags import get_hashtags
 
+trends_ls = get_hashtags()
 print(trends_ls)
 
 for idx, trend in enumerate(trends_ls):
