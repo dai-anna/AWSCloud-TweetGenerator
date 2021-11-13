@@ -21,3 +21,7 @@ make install
 ## Project Architecture
 [INSERT ARCHITECTURE DIAGRAM]
 
+## Frontend
+<div align="center">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/58488209/141659113-eff3e422-1889-4351-84c2-5c07dad951e1.png">
+</div>
