@@ -4,6 +4,8 @@ numpy
 numba
 pandas
 fastapi
+uvicorn
+jinja2
 git+https://github.com/twintproject/twint.git@origin/master#egg=twint
 boto3
 black

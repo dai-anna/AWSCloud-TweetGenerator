@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Hello, world!</title>
+</head>
+
+<body class="bg-light">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+    <div.row class="container" style="max-width: 100%;">
+        <div class="row"></div>
+        <h1 class="text-center" style="margin-top: 0.5em; margin-bottom: 0.5em;">NOAHGIFT</h1>
+
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-9">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <h5 class="card-title">Choose Trending Topic</h5>
+
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Regular link</a>
+                            <a class="dropdown-item active" href="#">Active link</a>
+                            <a class="dropdown-item" href="#">Another link</a>
+                        </div>
+
+                        <select class="custom-select" style="margin-bottom: 1em;">
+                            <option selected>Choose your topic...</option>
+                            {% for ht in hashtags %}
+                            <option value="{{ht}}">{{ht}}</option>
+                            {% endfor %}
+                        </select>
+
+
+
+
+
+                        <a href="#" class="btn btn-primary">Generate Tweet!</a>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-9">
+                <div style="text-align: center;" class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                        class="bi bi-arrow-down" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="col"></div>
+
+        </div>
+
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-9">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <dif class="card-body">
+                        <h5 class="card-title">Result</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                Your tweet will appear here.
+                            </div>
+                        </div>
+                    </dif>
+                </div>
+            </div>
+            <div class="col"></div>
+
+        </div>
+    </div.row>
+
+
+
+
+
+
+
+
+
+    <p align="center" style="color: #AAAAAA;">&copy; Us, 2021</p>
+</body>
+
+</html>
