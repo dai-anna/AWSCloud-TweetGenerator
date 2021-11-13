@@ -14,5 +14,9 @@ headers = {
 response = requests.request("GET", url, headers=headers, data=payload)
 
 tweet_data = response.json()
+
+trends_ls = []
+
 for i in range(0, 10):
-    print(tweet_data[0]["trends"][i]["name"])
+    trends_ls.append(tweet_data[0]["trends"][i]["name"])
+    # print(tweet_data[0]["trends"][i]["name"])
