@@ -9,26 +9,29 @@ class IacStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
     
-        vpc = aws_ec2.Vpc(self, "main-vpc")
+        vpc = aws_ec2.Vpc(
+            self,
+            id = "mainvpc",
+            max_azs = 1
+        )
         i_vpc = aws_ec2.Vpc.from_vpc_attributes(self,
             "main-ipvc", 
             availability_zones = [i.availability_zone for i in vpc.public_subnets], 
-            vpc_id = "main-vpc",
+            vpc_id = "mainvpc",
             public_subnet_ids = [i.subnet_id for i in vpc.public_subnets],
         )
         sg = aws_ec2.SecurityGroup(
             self,
-            id = "all-sg-id",
+            id = "allsgid",
             vpc = i_vpc,
-            allow_all_outbound = True,
-            security_group_name = "all-sg-name"
+            #allow_all_outbound = True,
         )
         batch_compute_resources = aws_batch.ComputeResources(
             vpc = i_vpc,
             desiredv_cpus = 1,
             maxv_cpus = 1,
             minv_cpus = 0,
-            security_groups = sg
+            security_groups = [sg],
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
