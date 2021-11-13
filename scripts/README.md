@@ -1,1 +1,1 @@
-This directory contains the working scripts to fetch trending hastags and scrape tweets.
+This directory contains the working scripts for the application.
