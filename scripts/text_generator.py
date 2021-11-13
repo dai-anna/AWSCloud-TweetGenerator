@@ -2,7 +2,18 @@
 import nltk
 from typing import Dict, List
 import numpy as np
-import numba
+import boto3
+import os
+
+#%%
+s3 = boto3.resource(
+    service_name='s3',
+    region_name='us-east-1',
+    aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY")
+)
+
+bucket = s3.Bucket("exp-noahgift")
 # %%
 
 
@@ -111,9 +122,6 @@ print(finish_sentence("THISWORDDOESNOTEXIST she was not".split(), n=5, corpus=co
 print(finish_sentence("she was not".split(), n=3, corpus=corpus, deterministic=True))
 print(finish_sentence("i found that".split(), n=4, corpus=corpus))
 print(finish_sentence("when she saw".split(), n=2, corpus=corpus))
-
-#%%
-%%timeit
 print(finish_sentence("when she saw".split(), n=3, corpus=corpus))
 
 
