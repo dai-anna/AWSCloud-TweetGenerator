@@ -12,6 +12,6 @@ for idx, trend in enumerate(trends_ls):
     c.Since = (datetime.datetime.now() - datetime.timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M:%S")
     c.Until = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    c.to_csv = True
+    c.Store_csv = True
     c.Output = f"../../data/twint_out.csv"
     twint.run.Search(c)
