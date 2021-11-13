@@ -21,6 +21,7 @@ bucket.download_file("text-generator/proba_dict.joblib", f"{ROOT_DIR}artifacts/p
 
 proba_dict = joblib.load(f"{ROOT_DIR}artifacts/proba_dict.joblib")
 
+
 def finish_sentence(sentence: List[str], n: int, corpus: List[str], deterministic=False):
     """Finish sentence using n-grams built on corpus."""
 

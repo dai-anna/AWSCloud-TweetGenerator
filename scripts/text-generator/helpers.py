@@ -20,6 +20,7 @@ bucket = s3.Bucket("exp-noahgift")
 
 # %%
 
+
 def dict_normalize(d: Dict[str, float]):
     """Normalize dict of word: count pairs s.t. values sum to one"""
     s = sum(d.values())
@@ -45,7 +46,9 @@ def build_proba_dict(n: int, corpus: str):
 
     proba_dict = {k: dict_normalize(v) for k, v in count_dict.items()}
     joblib.dump(proba_dict, f"{ROOT_DIR}artifacts/proba_dict.joblib")
-    bucket.upload_file(f"{ROOT_DIR}artifacts/proba_dict.joblib", f"text-generator/proba_dict.joblib")
+    bucket.upload_file(
+        f"{ROOT_DIR}artifacts/proba_dict.joblib", f"text-generator/proba_dict.joblib"
+    )
     print("[INFO] Uploaded model artifacts to S3.")
     return proba_dict
 

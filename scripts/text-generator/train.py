@@ -9,10 +9,14 @@ import joblib
 from helpers import build_proba_dict, get_pdist_from_proba_dict
 
 #%%
-def train(n: int, corpus: List[str],):
+def train(
+    n: int,
+    corpus: List[str],
+):
     print("[INFO] Starting training.")
     build_proba_dict(n, corpus)
     print("[INFO] Done with training.")
+
 
 if __name__ == "__main__":
     corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
