@@ -13,5 +13,5 @@ for idx, trend in enumerate(trends_ls):
     c.Until = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     c.Store_csv = True
-    c.Output = f"../../data/twint_out_{idx}.csv"
+    c.Output = f"twint_out_{idx}.csv"
     twint.run.Search(c)
