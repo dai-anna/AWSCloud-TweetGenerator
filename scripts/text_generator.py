@@ -2,6 +2,7 @@
 import nltk
 from typing import Dict, List
 import numpy as np
+import numba
 # %%
 
 
@@ -46,6 +47,8 @@ def build_proba_dict(n: int, corpus: str):
 
     proba_dict = {k: dict_normalize(v) for k, v in count_dict.items()}
     return proba_dict
+
+
 
 
 def get_pdist_from_proba_dict(proba_dict: Dict[str, Dict[str, float]], key: List[str], n: int, corpus: List[str]):
@@ -108,6 +111,16 @@ print(finish_sentence("THISWORDDOESNOTEXIST she was not".split(), n=5, corpus=co
 print(finish_sentence("she was not".split(), n=3, corpus=corpus, deterministic=True))
 print(finish_sentence("i found that".split(), n=4, corpus=corpus))
 print(finish_sentence("when she saw".split(), n=2, corpus=corpus))
+
+#%%
+%%timeit
 print(finish_sentence("when she saw".split(), n=3, corpus=corpus))
 
 
+#%%
+import cProfile
+
+with cProfile.Profile() as pr:
+    finish_sentence("she was not".split(), n=3, corpus=corpus)
+
+pr.print_stats(sort="tottime")

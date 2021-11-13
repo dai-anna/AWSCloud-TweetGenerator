@@ -4,3 +4,4 @@ numpy
 numba
 pandas
 fastapi
+git+https://github.com/twintproject/twint.git@origin/master#egg=twint
