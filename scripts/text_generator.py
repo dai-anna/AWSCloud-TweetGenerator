@@ -14,22 +14,6 @@ s3 = boto3.resource(
 )
 
 bucket = s3.Bucket("exp-noahgift")
-# %%
-
-
-def test_generator():
-    """Test Markov text generator."""
-    corpus = nltk.corpus.gutenberg.raw('austen-sense.txt')
-    corpus = nltk.word_tokenize(corpus.lower())
-
-    words = finish_sentence(
-        ['she', 'was', 'not'],
-        3,
-        corpus,
-        deterministic=True,
-    )
-    assert words == ['she', 'was', 'not', 'in', 'the', 'world', '.']
-
 
 # %%
 
