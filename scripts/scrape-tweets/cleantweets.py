@@ -1,6 +1,10 @@
+#%%
+
 import pandas as pd
-from gethashtags import trends_ls
+# from gethashtags import trends_ls
 
-df = pd.read_csv("../../data/twint_out_0.csv", sep = ",")
-df.head()
-
+df = pd.read_csv("twint_out_1.csv", sep = ",")
+df["tweet"].to_list()
+df.columns
+df[df["language"] == "en"]
+# %%
