@@ -4,6 +4,8 @@ from aws_cdk import (
     aws_ec2,
     aws_ecs,
     aws_s3,
+    aws_events,
+    aws_events_targets,
 )
 
 class IacStack(cdk.Stack):
@@ -35,7 +37,6 @@ class IacStack(cdk.Stack):
             minv_cpus = 0,
             security_groups = [sg],
             type=aws_batch.ComputeResourceType("SPOT"),
-            
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
@@ -71,6 +72,32 @@ class IacStack(cdk.Stack):
             self,
             id = "bucket1",
         )
+        schedule1 = aws_events.Schedule.cron(hour="3", minute="5")
+        target1 = aws_events_targets.BatchJob(
+            job_queue_arn = batch_queue.job_queue_arn,
+            job_queue_scope = q_batch_compute_env.compute_environment,
+            job_definition_arn = batch_job_definition.job_definition_arn,
+            job_definition_scope = q_batch_compute_env.compute_environment,
+            attempts = 2,
+        )
+        #schedule2 = aws_events.Schedule.cron(hour="6", minute="5")
+        
+        #target2 = aws_events_targets.BatchJob(
+        #)
+        
+        cronjob1 = aws_events.Rule(
+            self,
+            id="cronjob1",
+            schedule=schedule1,
+            targets=[target1]
+        )
+        #cronjob2 = aws_events.Rule(
+        #    self,
+        #    id="cronjob2",
+        #    schedule=schedule2,
+        #    targets=[target2]
+        #)
+        
 #        bucket.grant_read_write(
 #            identity= ,
 #            objects_key_pattern = {}
