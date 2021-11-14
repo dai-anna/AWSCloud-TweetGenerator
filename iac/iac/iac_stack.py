@@ -13,7 +13,11 @@ class IacStack(cdk.Stack):
 
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-    
+        
+        bucket = aws_s3.Bucket(
+            self,
+            id = "mainbucket",
+        )
         vpc = aws_ec2.Vpc(
             self,
             id = "mainvpc",
@@ -61,7 +65,7 @@ class IacStack(cdk.Stack):
             image = aws_ecs.RepositoryImage(image_name="moritzwilksch/dukerepo:datacollector"),
             memory_limit_mib = 512,
             #command = ,
-            environment = ["API_TOKEN",os.getenv("API_TOKEN")],
+            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucketname}
         )
         batch_job_definition = aws_batch.JobDefinition(
             self,
@@ -69,10 +73,6 @@ class IacStack(cdk.Stack):
             container = batch_job_container,
         )
         
-        bucket1 = aws_s3.Bucket(
-            self,
-            id = "bucket1",
-        )
         schedule1 = aws_events.Schedule.cron(hour="3", minute="5")
         target1 = aws_events_targets.BatchJob(
             job_queue_arn = batch_queue.job_queue_arn,
