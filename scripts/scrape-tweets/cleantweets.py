@@ -67,13 +67,10 @@ all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace("#", '', regex=True)
 #     df = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx].copy()
 #     df = df["tweet"]
 
-with tempfile.TemporaryFile() as fp:
-    all_tweets_raw.to_csv(fp)
-    fp.seek(0)
-    bucket.upload_fileobj(fp, "trash.csv")
+for idx in all_tweets_raw["tag_idx"].unique():
+    with tempfile.TemporaryFile() as fp:
+        export = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx,"tweet"]
+        export.to_csv(fp)
+        fp.seek(0)
+        bucket.upload_fileobj(fp, f"clean_outputs/clean_out_{idx}.csv")
 
-# bucket.upload_file(f"clean_out_{idx}.csv", bucket)
-
-
-
-# print(all_tweets_raw.head())
