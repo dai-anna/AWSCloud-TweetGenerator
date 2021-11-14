@@ -21,7 +21,7 @@ s3 = boto3.resource(
     aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
 )
 
-bucket = s3.Bucket("exp-noahgift")
+bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
 
 def get_hashtags():
     """ Scrapes to 10 trending hashtags in the US. """
