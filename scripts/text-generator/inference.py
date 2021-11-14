@@ -6,6 +6,7 @@ import boto3
 import os
 import joblib
 from train import build_proba_dict, get_pdist_from_proba_dict
+import tempfile
 
 ROOT_DIR = "./"
 
@@ -17,9 +18,18 @@ s3 = boto3.resource(
 )
 
 bucket = s3.Bucket("exp-noahgift")
-bucket.download_file("text-generator/proba_dict.joblib", f"{ROOT_DIR}artifacts/proba_dict.joblib")
+# bucket.download_file("text-generator/proba_dict.joblib", f"{ROOT_DIR}artifacts/proba_dict.joblib")
+
+with tempfile.TemporaryFile() as f:
+    bucket.download_fileobj("text-generator/proba_dict.joblib", f)
+    f.seek(0)
+    proba_dict = joblib.load(f)
+
 print("[INFO] Model downloaded from S3.")
-proba_dict = joblib.load(f"{ROOT_DIR}artifacts/proba_dict.joblib")
+# proba_dict = joblib.load(f"{ROOT_DIR}artifacts/proba_dict.joblib")
+
+corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
+corpus = nltk.word_tokenize(corpus.lower())
 
 
 def finish_sentence(sentence: List[str], n: int, corpus: List[str], deterministic=False):
@@ -55,6 +65,4 @@ def finish_sentence(sentence: List[str], n: int, corpus: List[str], deterministi
 # Backoff test
 
 if __name__ == "__main__":
-    corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
-    corpus = nltk.word_tokenize(corpus.lower())
     print(finish_sentence("when she saw".split(), n=3, corpus=corpus))
