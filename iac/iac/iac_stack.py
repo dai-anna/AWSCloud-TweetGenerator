@@ -2,7 +2,8 @@ from aws_cdk import (
     core as cdk,
     aws_batch,
     aws_ec2,
-    aws_ecs
+    aws_ecs,
+    aws_s3,
 )
 
 class IacStack(cdk.Stack):
@@ -30,9 +31,11 @@ class IacStack(cdk.Stack):
         batch_compute_resources = aws_batch.ComputeResources(
             vpc = i_vpc,
             desiredv_cpus = 1,
-            maxv_cpus = 1,
+            maxv_cpus = 2,
             minv_cpus = 0,
             security_groups = [sg],
+            type=aws_batch.ComputeResourceType("SPOT"),
+            
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
@@ -53,15 +56,24 @@ class IacStack(cdk.Stack):
             compute_environments = [q_batch_compute_env],
         )
         batch_job_container = aws_batch.JobDefinitionContainer(
-            image = aws_ecs.RepositoryImage(image_name="hello-world:latest"),
+            image = aws_ecs.RepositoryImage(image_name="moritzwilksch/dukerepo:datacollector"),
+            memory_limit_mib = 512,
             #command = ,
             #environment = ,
         )
-        
         batch_job_definition = aws_batch.JobDefinition(
             self,
             id = "batch_jd",
             container = batch_job_container,
         )
+        
+        bucket1 = aws_s3.Bucket(
+            self,
+            id = "bucket1",
+        )
+#        bucket.grant_read_write(
+#            identity= ,
+#            objects_key_pattern = {}
+#        )
         pass
     pass
