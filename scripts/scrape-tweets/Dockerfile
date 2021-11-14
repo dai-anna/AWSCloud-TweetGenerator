@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./gethashtags.py /app/gethashtags.py
 COPY ./gettweets.py /app/gettweets.py
-COPY ./requirements.txt /app/requirements.txt
+COPY ./requirements_scrapetweets.txt /app/requirements.txt
 
 # install git for twint install
 RUN apt-get update \

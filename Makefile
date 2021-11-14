@@ -1,3 +1,12 @@
+# Define Docker contexts
+DATACOLLECTOR_CONTEXT=./scripts/scrape-tweets
+FRONTEND_CONTEXT=./scripts/application
+
+# Define DockerHub locations
+DOCKERHUB_LOCATION_DATACOLLECTOR=moritzwilksch/dukerepo:datacollector
+DOCKERHUB_LOCATION_FRONTEND=moritzwilksch/dukerepo:frontend
+
+
 install:
 	pip install --upgrade pip
 	pip install -r requirements.txt
@@ -10,34 +19,34 @@ test: install
 
 ################################ DOCKER #######################################
 # Data Collection
+
 docker-build:
-	cp requirements.txt ./scripts/scrape-tweets/requirements.txt
-	docker build -t datacollector -f ./scripts/scrape-tweets/Dockerfile ./scripts/scrape-tweets/ 
-	rm ./scripts/scrape-tweets/requirements.txt
+	docker build --rm -t datacollector -f $(DATACOLLECTOR_CONTEXT)/Dockerfile $(DATACOLLECTOR_CONTEXT)/ 
 
 docker-build-push:
-	cp requirements.txt ./scripts/scrape-tweets/requirements.txt
-	docker build -t moritzwilksch/dukerepo:datacollector -f ./scripts/scrape-tweets/Dockerfile ./scripts/scrape-tweets/ --no-cache
-	rm ./scripts/scrape-tweets/requirements.txt
-	docker push moritzwilksch/dukerepo:datacollector
+	docker build --rm -t $(DOCKERHUB_LOCATION_DATACOLLECTOR) -f $(DATACOLLECTOR_CONTEXT)/Dockerfile $(DATACOLLECTOR_CONTEXT)/ --no-cache
+	docker push $(DOCKERHUB_LOCATION_DATACOLLECTOR)
 
 docker-run:
-	docker run -d --name datacollector --env-file scripts/scrape-tweets/env.list datacollector
+	docker run -d --name datacollector --env-file $(DATACOLLECTOR_CONTEXT)/env.list datacollector
 
 docker-run-debug:
-	docker run -it --name datacollector --env-file scripts/scrape-tweets/env.list datacollector
+	docker run -it --name datacollector --env-file $(DATACOLLECTOR_CONTEXT)/env.list datacollector
 	
 docker-clean:
 	docker rm -f datacollector
 
 # Frontend
 docker-build-frontend: docker-clean-frontend
-	docker build -t frontend -f ./scripts/application/Dockerfile ./scripts/
-
+	docker build --rm -t frontend -f $(FRONTEND_CONTEXT)/Dockerfile ./scripts/
 
 docker-run-frontend:
-	docker run -it --name frontend --env-file ./scripts/scrape-tweets/env.list -p 8080:8080 frontend
+	docker run -d --name frontend --env-file $(DATACOLLECTOR_CONTEXT)/env.list -p 8080:8080 frontend
 
 docker-clean-frontend:
 	docker stop frontend
 	docker rm -f frontend
+
+docker-build-push-frontend:
+	docker build --rm -t $(DOCKERHUB_LOCATION_FRONTEND) -f $(FRONTEND_CONTEXT)/Dockerfile ./scripts/ --no-cache
+	docker push $(DOCKERHUB_LOCATION_FRONTEND)
