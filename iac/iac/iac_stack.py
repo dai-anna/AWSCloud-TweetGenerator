@@ -2,6 +2,7 @@ from aws_cdk import (
     core as cdk,
     aws_batch,
     aws_ec2,
+    aws_ecs
 )
 
 class IacStack(cdk.Stack):
@@ -17,7 +18,7 @@ class IacStack(cdk.Stack):
         i_vpc = aws_ec2.Vpc.from_vpc_attributes(self,
             "main-ipvc", 
             availability_zones = [i.availability_zone for i in vpc.public_subnets], 
-            vpc_id = "mainvpc",
+            vpc_id = vpc.vpc_id,
             public_subnet_ids = [i.subnet_id for i in vpc.public_subnets],
         )
         sg = aws_ec2.SecurityGroup(
@@ -51,7 +52,16 @@ class IacStack(cdk.Stack):
             "batch-queue",
             compute_environments = [q_batch_compute_env],
         )
+        batch_job_container = aws_batch.JobDefinitionContainer(
+            image = aws_ecs.RepositoryImage(image_name="hello-world:latest"),
+            #command = ,
+            #environment = ,
+        )
+        
+        batch_job_definition = aws_batch.JobDefinition(
+            self,
+            id = "batch_jd",
+            container = batch_job_container,
+        )
         pass
     pass
-
-#availability_zone
