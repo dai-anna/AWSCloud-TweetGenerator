@@ -6,7 +6,7 @@ COPY application/ /application
 COPY text_generator/inference.py /application/inference.py
 COPY text_generator/train.py /application/train.py
 
-ENV IN_DOCKER=1
+ENV IS_DOCKER=1
 
 RUN pip install -r /application/requirements_frontend.txt
 RUN python -m nltk.downloader gutenberg \
