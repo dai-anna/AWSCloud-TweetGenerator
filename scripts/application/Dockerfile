@@ -5,6 +5,7 @@ WORKDIR /application
 COPY . /application
 COPY templates /application/templates
 
+
 RUN pip install --upgrade pip \
     && pip install -r /application/requirements_frontend.txt
 
