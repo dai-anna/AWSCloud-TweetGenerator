@@ -26,9 +26,9 @@ for idx, trend in enumerate(trends_ls):
 
     c.Store_csv = True
     c.Output = f"twint_out_{idx}.csv"
-    print(f"[INFO] Starting {trend} scrape")
+    print(f"[INFO] Starting {idx}: {trend} scrape")
     twint.run.Search(c)
-    print(f"[INFO] Finished {trend} scrape")
+    print(f"[INFO] Finished {idx}: {trend} scrape")
     print(f"[INFO] Starting S3 upload")
     bucket.upload_file(f"twint_out_{idx}.csv", f"twint_out_{idx}.csv")
     print(f"[INFO] Finished S3 upload")
