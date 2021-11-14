@@ -44,18 +44,18 @@
                             <a class="dropdown-item" href="#">Another link</a>
                         </div>
 
-                        <select class="custom-select" style="margin-bottom: 1em;">
-                            <option selected>Choose your topic...</option>
-                            {% for ht in hashtags %}
-                            <option value="{{ht}}">{{ht}}</option>
-                            {% endfor %}
-                        </select>
-
-
-
-
-
-                        <a href="#" class="btn btn-primary">Generate Tweet!</a>
+                        <form id="inputform">
+                            <select class="custom-select" style="margin-bottom: 1em;" name="userinput" form="inputform">
+                                {% for ht in hashtags %}
+                                {% if ht != selected_topic %}
+                                <option value="{{ht}}">{{ht}}</option>
+                                {% else %}
+                                <option value="{{ht}}" selected>{{ht}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <input type="submit" class="btn btn-primary" value="Submit">
+                        </form>
 
                     </div>
                 </div>

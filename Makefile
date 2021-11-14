@@ -31,12 +31,12 @@ docker-clean:
 	docker rm -f datacollector
 
 # Frontend
-docker-build-frontend:
-	docker build -t frontend -f ./application/Dockerfile ./application/
+docker-build-frontend: docker-clean-frontend
+	docker build -t frontend -f ./scripts/application/Dockerfile ./scripts/
 
 
 docker-run-frontend:
-	docker run -d --name frontend --env-file ./scripts/scrape-tweets/env.list -p 8080:8080 frontend
+	docker run -it --name frontend --env-file ./scripts/scrape-tweets/env.list -p 8080:8080 frontend
 
 docker-clean-frontend:
 	docker stop frontend

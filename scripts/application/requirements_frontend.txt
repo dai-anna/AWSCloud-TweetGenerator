@@ -6,3 +6,6 @@ boto3
 black
 joblib
 pytest
+nltk
+numpy
+python-multipart
