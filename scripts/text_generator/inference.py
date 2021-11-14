@@ -32,7 +32,9 @@ corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
 corpus = nltk.word_tokenize(corpus.lower())
 
 
-def finish_sentence(sentence: List[str], n: int, corpus: List[str], deterministic=False):
+def finish_sentence(
+    sentence: List[str], n: int, corpus: List[str], deterministic=False
+):
     """Finish sentence using n-grams built on corpus."""
 
     # Sample next words
@@ -49,7 +51,9 @@ def finish_sentence(sentence: List[str], n: int, corpus: List[str], deterministi
             except:
                 generated_word = "<NA>"
         else:
-            generated_word = np.random.choice(list(p_dist.keys()), p=list(p_dist.values()))
+            generated_word = np.random.choice(
+                list(p_dist.keys()), p=list(p_dist.values())
+            )
 
         # print(generated_word)
         response.append(generated_word)

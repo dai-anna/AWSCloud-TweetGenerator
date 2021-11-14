@@ -83,7 +83,8 @@ def train(
 
     if upload_to_s3:
         bucket.upload_file(
-            f"{ROOT_DIR}artifacts/proba_dict.joblib", f"text-generator/proba_dict.joblib"
+            f"{ROOT_DIR}artifacts/proba_dict.joblib",
+            f"text-generator/proba_dict.joblib",
         )
         print("[INFO] Uploaded model artifacts to S3.")
     print("[INFO] Done with training.")

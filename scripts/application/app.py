@@ -21,8 +21,6 @@ app = FastAPI()
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-
-
 def get_available_hashtags():
     return ["Select trending topic...", "#python", "#fastapi", "#swagger"]  # dummy data
 
@@ -47,4 +45,3 @@ async def read_item(request: Request, userinput: Optional[str] = Form(None)):
     }
 
     return templates.TemplateResponse("index.html", params)
-
