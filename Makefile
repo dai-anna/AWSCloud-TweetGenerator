@@ -5,7 +5,8 @@ install:
 run-frontend:
 	uvicorn --app-dir application/ app:app --reload --host 0.0.0.0 --port 8080
 
-
+test:
+	pytest tests/
 
 ################################ DOCKER #######################################
 # Data Collection
