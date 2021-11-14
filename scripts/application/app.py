@@ -2,7 +2,9 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from inference import generate_text, corpus
+import os
+print(os.getcwd())
+from scripts.text_generator.inference import generate_text, corpus
 
 app = FastAPI()
 
