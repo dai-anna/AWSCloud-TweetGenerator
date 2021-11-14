@@ -35,14 +35,16 @@ def load_files(filenames):
         if file.startswith('twint_out'):
             tag = lines[int(re.findall("\d+",file)[0])]
             tag_idx = int(re.findall("\d+",file)[0])
-            df = pd.read_csv(file, sep=",", usecols = ['tweet'])
+            df = pd.read_csv(file, sep=",", usecols = ['tweet','language'])
+            df = df.loc[df['language']=='en'].copy()
+            df.drop("language",axis=1,inplace=True)
             df["tag"] = tag.strip("#")
             df["tag_idx"] = tag_idx
+            
             yield df
         
 all_tweets_raw = pd.concat(load_files(tweet_files))
-all_tweets_raw.to_csv(f"{ROOT_DIR}raw_tweets.csv")
-
+# all_tweets_raw.to_csv(f"{ROOT_DIR}raw_tweets.csv")
 
 
 print(all_tweets_raw.head())
