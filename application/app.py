@@ -8,7 +8,7 @@ app = FastAPI()
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-templates = Jinja2Templates(directory="application/templates")
+templates = Jinja2Templates(directory="templates")
 
 
 def get_available_hashtags():

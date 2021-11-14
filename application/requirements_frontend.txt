@@ -1,0 +1,8 @@
+requests
+fastapi
+uvicorn
+jinja2
+boto3
+black
+joblib
+pytest
