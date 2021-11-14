@@ -2,6 +2,7 @@ import os
 import requests
 
 access_token = os.environ.get("API_TOKEN")
+print(f"[INFO] Using access_token={access_token}")
 
 url = "https://api.twitter.com/1.1/trends/place.json?id=23424977"
 
@@ -33,5 +34,5 @@ def get_hashtags():
     assert len(trends_ls) == 10
     print("[INFO] Fetched all ten hashtags.")
 
-    
+
     return trends_ls

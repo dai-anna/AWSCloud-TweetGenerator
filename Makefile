@@ -7,14 +7,14 @@ run-frontend:
 
 docker-build:
 	cp requirements.txt ./scripts/scrape-tweets/requirements.txt
-	docker build -t datacollector -f ./scripts/scrape-tweets/Dockerfile ./scripts/scrape-tweets/
+	docker build -t datacollector -f ./scripts/scrape-tweets/Dockerfile ./scripts/scrape-tweets/ --no-cache
 	rm ./scripts/scrape-tweets/requirements.txt
 
 docker-run:
-	docker run -d --name datacollector -e API_TOKEN=${API_TOKEN} datacollector
+	docker run -d --name datacollector --env-file scripts/scrape-tweets/env.list datacollector
 
 docker-run-debug:
-	docker run -it --name datacollector -e API_TOKEN=${API_TOKEN} datacollector
+	docker run -it --name datacollector --env-file scripts/scrape-tweets/env.list datacollector
 	
 docker-clean:
 	docker rm -f datacollector
