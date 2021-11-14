@@ -1,11 +1,20 @@
 import twint
 import datetime
-from gethashtags import get_hashtags
+# from gethashtags import get_hashtags
 import os
 import boto3
 
-trends_ls = get_hashtags()
-print(trends_ls)
+ROOT_DIR = "./"
+
+filePath = f"{ROOT_DIR}hashtags.txt"
+
+if os.path.exists(filePath):
+    os.remove(filePath)
+else:
+    pass
+
+# trends_ls = get_hashtags()
+# print(trends_ls)
 
 s3 = boto3.resource(
     service_name="s3",
@@ -14,14 +23,24 @@ s3 = boto3.resource(
     aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
 )
 
+
 bucket = s3.Bucket("exp-noahgift")
+bucket.download_file("hashtags.txt", f"{ROOT_DIR}hashtags.txt")
+print("[INFO] Hashtags fetched from S3.")
+
+with open(f"{ROOT_DIR}hashtags.txt") as file:
+    trends_ls = file.readlines()
+    trends_ls = [line.rstrip() for line in trends_ls]
+
 
 for idx, trend in enumerate(trends_ls):
     trend = trend.strip("#")
     c = twint.Config()
-    c.Search = "#"+trend  # your search here
+    c.Search = "#" + trend  # your search here
     c.Lang = "en"
-    c.Since = (datetime.datetime.now() - datetime.timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S")
+    c.Since = (datetime.datetime.now() - datetime.timedelta(minutes=30)).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
     c.Until = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     c.Store_csv = True
@@ -32,5 +51,3 @@ for idx, trend in enumerate(trends_ls):
     print(f"[INFO] Starting S3 upload")
     bucket.upload_file(f"twint_out_{idx}.csv", f"twint_out_{idx}.csv")
     print(f"[INFO] Finished S3 upload")
-
-
