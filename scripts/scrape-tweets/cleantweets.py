@@ -3,6 +3,7 @@ import os
 import re
 import boto3
 import tempfile
+import datetime
 
 ROOT_DIR = "./"
 
@@ -36,7 +37,7 @@ def load_files(filenames):
         if file.startswith('twint_out'):
             tag = lines[int(re.findall("\d+",file)[0])]
             tag_idx = int(re.findall("\d+",file)[0])
-            df = pd.read_csv(file, sep=",", usecols = ['tweet','language'])
+            df = pd.read_csv(file, sep=",", usecols = ['date', 'tweet','language'])
             df = df.loc[df['language']=='en'].copy()
             df.drop("language",axis=1,inplace=True)
             df["tag"] = tag.strip("#")
@@ -46,6 +47,14 @@ def load_files(filenames):
         
 all_tweets_raw = pd.concat(load_files(tweet_files))
 # all_tweets_raw.to_csv(f"{ROOT_DIR}raw_tweets.csv")
+
+print(f"[INFO] Starting Archive S3 upload")
+
+with tempfile.TemporaryFile() as fp:
+    all_tweets_raw.to_csv(fp, index = False)
+    fp.seek(0)
+    bucket.upload_fileobj(fp, f"archive/twint_out_{datetime.date.today()}.csv")
+print(f"[INFO] Ending Archive S3 upload")
 
 emoji_pattern = re.compile("["
     u"\U0001F600-\U0001F64F"  # emoticons
@@ -67,10 +76,12 @@ all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace("#", '', regex=True)
 #     df = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx].copy()
 #     df = df["tweet"]
 
+print(f"[INFO] Starting Clean S3 upload")
 for idx in all_tweets_raw["tag_idx"].unique():
     with tempfile.TemporaryFile() as fp:
-        export = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx,"tweet"]
-        export.to_csv(fp)
+        export = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx,"tweet"].to_list()
+        fp.writelines([str.encode(x + "\n") for x in export])
         fp.seek(0)
-        bucket.upload_fileobj(fp, f"clean_outputs/clean_out_{idx}.csv")
+        bucket.upload_fileobj(fp, f"clean_outputs/clean_out_{idx}.txt")
+print(f"[INFO] Ending Clean S3 upload")
 
