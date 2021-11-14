@@ -43,4 +43,5 @@ def load_files(filenames):
 all_tweets_raw = pd.concat(load_files(tweet_files))
 all_tweets_raw.to_csv(f"{ROOT_DIR}raw_tweets.csv")
 
+
 print(all_tweets_raw.head())
