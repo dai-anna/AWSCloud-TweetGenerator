@@ -38,7 +38,7 @@ for idx, trend in enumerate(trends_ls):
     c = twint.Config()
     c.Search = "#" + trend  # your search here
     c.Lang = "en"
-    c.Since = (datetime.datetime.now() - datetime.timedelta(minutes=30)).strftime(
+    c.Since = (datetime.datetime.now() - datetime.timedelta(minutes=10)).strftime(
         "%Y-%m-%d %H:%M:%S"
     )
     c.Until = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -48,6 +48,6 @@ for idx, trend in enumerate(trends_ls):
     print(f"[INFO] Starting {idx}: {trend} scrape")
     twint.run.Search(c)
     print(f"[INFO] Finished {idx}: {trend} scrape")
-    print(f"[INFO] Starting S3 upload")
-    bucket.upload_file(f"twint_out_{idx}.csv", f"twint_out_{idx}.csv")
-    print(f"[INFO] Finished S3 upload")
+    # print(f"[INFO] Starting S3 upload")
+    # bucket.upload_file(f"twint_out_{idx}.csv", f"twint_out_{idx}.csv")
+    # print(f"[INFO] Finished S3 upload")

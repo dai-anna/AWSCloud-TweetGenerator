@@ -70,11 +70,7 @@ url_mentions = re.compile(r'(@\S+) | (https?:\/\/.+)')
 all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(emoji_pattern, '', regex=True)
 all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(url_mentions, '', regex=True)
 all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace("#", '', regex=True)
-
-
-# for idx in all_tweets_raw["tag_idx"].unique():
-#     df = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx].copy()
-#     df = df["tweet"]
+# all_tweets_raw["tweet"].apply(lambda z: z.replace(z[-x:],"") if (x==len(all_tweets_raw["tag"])) and (z[-x:]==all_tweets_raw["tag"]))
 
 print(f"[INFO] Starting Clean S3 upload")
 for idx in all_tweets_raw["tag_idx"].unique():
