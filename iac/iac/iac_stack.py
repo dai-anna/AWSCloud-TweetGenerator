@@ -7,6 +7,7 @@ from aws_cdk import (
     aws_events,
     aws_events_targets,
 )
+import os 
 
 class IacStack(cdk.Stack):
 
@@ -60,7 +61,7 @@ class IacStack(cdk.Stack):
             image = aws_ecs.RepositoryImage(image_name="moritzwilksch/dukerepo:datacollector"),
             memory_limit_mib = 512,
             #command = ,
-            #environment = ,
+            environment = ["API_TOKEN",os.getenv("API_TOKEN")],
         )
         batch_job_definition = aws_batch.JobDefinition(
             self,

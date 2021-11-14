@@ -2,11 +2,14 @@ FROM python:3.9-slim-buster
 
 WORKDIR /application
 
-COPY . /application
-COPY templates /application/templates
+COPY application/ /application
+COPY text_generator/inference.py /application/inference.py
+COPY text_generator/train.py /application/train.py
 
+ENV IS_DOCKER=1
 
-RUN pip install --upgrade pip \
-    && pip install -r /application/requirements_frontend.txt
+RUN pip install -r /application/requirements_frontend.txt
+RUN python -m nltk.downloader gutenberg \
+    && python -m nltk.downloader punkt
 
 ENTRYPOINT uvicorn app:app --host 0.0.0.0 --port 8080
