@@ -33,13 +33,13 @@ corpus = nltk.word_tokenize(corpus.lower())
 
 
 def finish_sentence(
-    sentence: List[str], n: int, corpus: List[str], deterministic=False
+    sentence: List[str], n: int, corpus: List[str], deterministic=False, max_len: int = 15
 ):
     """Finish sentence using n-grams built on corpus."""
 
     # Sample next words
     response = sentence.copy()
-    for _ in range(15):
+    for _ in range(max_len):
         base = response[-n + 1 :]
 
         # Get distribution over successors. Includes backoff.
@@ -69,4 +69,4 @@ def finish_sentence(
 # Backoff test
 
 if __name__ == "__main__":
-    print(finish_sentence("when she saw".split(), n=3, corpus=corpus))
+    print(finish_sentence("when she saw".split(), n=3, corpus=corpus, max_len=25))

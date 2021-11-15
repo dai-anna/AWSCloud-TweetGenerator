@@ -5,6 +5,7 @@ import numpy as np
 import boto3
 import os
 import joblib
+import tempfile
 
 ROOT_DIR = "./"
 
@@ -17,6 +18,11 @@ s3 = boto3.resource(
 )
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
+
+with tempfile.TemporaryFile() as f:
+    bucket.download_fileobj("2021-11-15/clean_out_0.txt", f)
+    f.seek(0)
+    tweets = [x.decode('utf-8').strip() for x in f.readlines()]
 
 # %%
 
@@ -91,6 +97,9 @@ def train(
 
 
 if __name__ == "__main__":
-    corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
+    # corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
+    corpus = ". ".join(tweets)
     corpus = nltk.word_tokenize(corpus.lower())
     train(3, corpus)
+
+    
