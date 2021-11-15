@@ -1,4 +1,5 @@
 # Define Docker contexts
+HASHTAGCOLLECTOR_CONTEXT=./scripts/scrape-hashtags
 DATACOLLECTOR_CONTEXT=./scripts/scrape-tweets
 FRONTEND_CONTEXT=./scripts/application
 
@@ -18,7 +19,18 @@ test:
 	pytest tests/
 
 ################################ DOCKER #######################################
-# Data Collection
+# Hashtag Data Collection
+docker-build-hashtags: docker-clean-hashtags
+	docker build --rm -t hashtagcollector -f $(HASHTAGCOLLECTOR_CONTEXT)/Dockerfile $(HASHTAGCOLLECTOR_CONTEXT)/ 
+
+docker-run-hashtags:
+	docker run -it --name hashtagcollector --env-file $(HASHTAGCOLLECTOR_CONTEXT)/env.list hashtagcollector
+	
+docker-clean-hashtags:
+	docker rm -f datacollector
+
+
+# Tweet Data Collection
 
 docker-build:
 	docker build --rm -t datacollector -f $(DATACOLLECTOR_CONTEXT)/Dockerfile $(DATACOLLECTOR_CONTEXT)/ 
