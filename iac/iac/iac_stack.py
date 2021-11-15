@@ -21,7 +21,13 @@ class IacStack(cdk.Stack):
         vpc = aws_ec2.Vpc(
             self,
             id = "mainvpc",
-            max_azs = 1
+            max_azs = 1,
+            subnet_configuration = [
+                aws_ec2.SubnetConfiguration(
+                    name = "public_subnet1",
+                    subnet_type = aws_ec2.SubnetType("PUBLIC")
+                )
+            ]
         )
         i_vpc = aws_ec2.Vpc.from_vpc_attributes(self,
             "main-ipvc", 
@@ -66,7 +72,7 @@ class IacStack(cdk.Stack):
             image = aws_ecs.RepositoryImage(image_name="moritzwilksch/dukerepo:datacollector"),
             memory_limit_mib = 512,
             #command = ,
-            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucketname}
+            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucket_name}
         )
         batch_job_definition = aws_batch.JobDefinition(
             self,
@@ -74,7 +80,7 @@ class IacStack(cdk.Stack):
             container = batch_job_container,
         )
         
-        schedule1 = aws_events.Schedule.cron(hour="3", minute="5")
+        schedule1 = aws_events.Schedule.cron(hour="3", minute="50")#1,31
         target1 = aws_events_targets.BatchJob(
             job_queue_arn = batch_queue.job_queue_arn,
             job_queue_scope = q_batch_compute_env.compute_environment,
@@ -100,9 +106,9 @@ class IacStack(cdk.Stack):
         #    targets=[target2]
         #)
         
-#        bucket.grant_read_write(
-#            identity= ,
-#            objects_key_pattern = {}
-#        )
+        #bucket.grant_read_write(
+        #    identity= ,
+        #    objects_key_pattern = {}
+        #)
         pass
     pass
