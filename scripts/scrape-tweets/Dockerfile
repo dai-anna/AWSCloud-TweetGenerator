@@ -2,9 +2,9 @@ FROM python:3.9-slim-buster
 
 WORKDIR /app
 
-COPY ./gethashtags.py /app/gethashtags.py
 COPY ./gettweets.py /app/gettweets.py
-COPY ./requirements_scrapetweets.txt /app/requirements.txt
+COPY ./gettweets.py /app/cleantweets.py
+COPY ./requirements_scrapetweets.txt /app/requirements_scrapetweets.txt
 
 # install git for twint install
 RUN apt-get update \
@@ -14,8 +14,8 @@ RUN apt-get update \
 
 
 RUN pip install --upgrade pip \
-    && pip install -r /app/requirements.txt
+    && pip install -r /app/requirements_scrapetweets.txt
 
 
 ENTRYPOINT ["python"]
-CMD ["/app/gettweets.py"]
+CMD ["/app/gettweets.py", "/app/cleantweets.py"]
