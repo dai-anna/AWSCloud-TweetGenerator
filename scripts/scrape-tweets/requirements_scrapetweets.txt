@@ -6,4 +6,3 @@ git+https://github.com/twintproject/twint.git@origin/master#egg=twint
 boto3
 black
 joblib
-pytest
