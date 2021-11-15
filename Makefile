@@ -4,6 +4,7 @@ DATACOLLECTOR_CONTEXT=./scripts/scrape-tweets
 FRONTEND_CONTEXT=./scripts/application
 
 # Define DockerHub locations
+DOCKERHUB_LOCATION_HASHTAGCOLLECTOR=moritzwilksch/dukerepo:hashtagcollector
 DOCKERHUB_LOCATION_DATACOLLECTOR=moritzwilksch/dukerepo:datacollector
 DOCKERHUB_LOCATION_FRONTEND=moritzwilksch/dukerepo:frontend
 
@@ -19,19 +20,22 @@ test:
 	pytest tests/
 
 ################################ DOCKER #######################################
-# Hashtag Data Collection
+######## Hashtag Data Collection ########
 docker-build-hashtags: docker-clean-hashtags
 	docker build --rm -t hashtagcollector -f $(HASHTAGCOLLECTOR_CONTEXT)/Dockerfile $(HASHTAGCOLLECTOR_CONTEXT)/ 
 
+docker-build-push-hashtags: docker-clean-hashtags
+	docker build --rm -t $(DOCKERHUB_LOCATION_HASHTAGCOLLECTOR) -f $(HASHTAGCOLLECTOR_CONTEXT)/Dockerfile $(HASHTAGCOLLECTOR_CONTEXT)/ 
+	docker push $(DOCKERHUB_LOCATION_HASHTAGCOLLECTOR)
+
 docker-run-hashtags:
-	docker run -it --name hashtagcollector --env-file $(HASHTAGCOLLECTOR_CONTEXT)/env.list hashtagcollector
+	docker run -it --name hashtagcollector --env-file $(DATACOLLECTOR_CONTEXT)/env.list hashtagcollector
 	
 docker-clean-hashtags:
-	docker rm -f datacollector
+	docker rm -f hashtagcollector
 
 
-# Tweet Data Collection
-
+######## Tweet Data Collection ########
 docker-build:
 	docker build --rm -t datacollector -f $(DATACOLLECTOR_CONTEXT)/Dockerfile $(DATACOLLECTOR_CONTEXT)/ 
 
@@ -48,7 +52,7 @@ docker-run-debug:
 docker-clean:
 	docker rm -f datacollector
 
-# Frontend
+######## Frontend ########
 docker-build-frontend: docker-clean-frontend
 	docker build --rm -t frontend -f $(FRONTEND_CONTEXT)/Dockerfile ./scripts/
 
