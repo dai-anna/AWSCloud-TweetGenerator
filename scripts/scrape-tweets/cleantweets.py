@@ -5,6 +5,8 @@ import boto3
 import tempfile
 import datetime
 
+today = datetime.date.today()
+
 ROOT_DIR = "./"
 
 filePath = f"{ROOT_DIR}hashtags.txt"
@@ -37,7 +39,7 @@ def load_files(filenames):
         if file.startswith('twint_out'):
             tag = lines[int(re.findall("\d+",file)[0])]
             tag_idx = int(re.findall("\d+",file)[0])
-            df = pd.read_csv(file, sep=",", usecols = ['date', 'tweet','language'])
+            df = pd.read_csv(file, sep=",", usecols = ['date', 'tweet', 'language'])
             df = df.loc[df['language']=='en'].copy()
             df.drop("language",axis=1,inplace=True)
             df["tag"] = tag.strip("#")
@@ -48,26 +50,18 @@ def load_files(filenames):
 all_tweets_raw = pd.concat(load_files(tweet_files))
 # all_tweets_raw.to_csv(f"{ROOT_DIR}raw_tweets.csv")
 
-print(f"[INFO] Starting Archive S3 upload")
+# no longer archiving separately
+# print(f"[INFO] Starting Archive S3 upload")
 
-with tempfile.TemporaryFile() as fp:
-    all_tweets_raw.to_csv(fp, index = False)
-    fp.seek(0)
-    bucket.upload_fileobj(fp, f"archive/twint_out_{datetime.date.today()}.csv")
-print(f"[INFO] Ending Archive S3 upload")
-
-emoji_pattern = re.compile("["
-    u"\U0001F600-\U0001F64F"  # emoticons
-    u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-    u"\U0001F680-\U0001F6FF"  # transport & map symbols
-    u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-    u"\U00002702-\U000027B0"
-    u"\U000024C2-\U0001F251"
-    "]+", flags=re.UNICODE)
+# with tempfile.TemporaryFile() as fp:
+#     all_tweets_raw.to_csv(fp, index = False)
+#     fp.seek(0)
+#     bucket.upload_fileobj(fp, f"archive/twint_out_{datetime.date.today()}.csv")
+# print(f"[INFO] Ending Archive S3 upload")
 
 url_mentions = re.compile(r'(@\S+) | (https?:\/\/.+)')
 
-all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(emoji_pattern, '', regex=True)
+all_tweets_raw["tweet"] = all_tweets_raw["tweet"].str.encode('ascii', 'ignore').str.decode('utf-8')
 all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(url_mentions, '', regex=True)
 all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace("#", '', regex=True)
 # all_tweets_raw["tweet"].apply(lambda z: z.replace(z[-x:],"") if (x==len(all_tweets_raw["tag"])) and (z[-x:]==all_tweets_raw["tag"]))
@@ -78,6 +72,6 @@ for idx in all_tweets_raw["tag_idx"].unique():
         export = all_tweets_raw.loc[all_tweets_raw["tag_idx"]==idx,"tweet"].to_list()
         fp.writelines([str.encode(x + "\n") for x in export])
         fp.seek(0)
-        bucket.upload_fileobj(fp, f"clean_outputs/clean_out_{idx}.txt")
+        bucket.upload_fileobj(fp, f"{today}/clean_out_{idx}.txt")
 print(f"[INFO] Ending Clean S3 upload")
 
