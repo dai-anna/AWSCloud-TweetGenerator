@@ -3,6 +3,9 @@ import datetime
 # from gethashtags import get_hashtags
 import os
 import boto3
+import datetime
+
+today = datetime.date.today()
 
 ROOT_DIR = "./"
 
@@ -25,10 +28,10 @@ s3 = boto3.resource(
 
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-bucket.download_file("hashtags.txt", f"{ROOT_DIR}hashtags.txt")
+bucket.download_file("hashtags.txt", f"{ROOT_DIR}{today}/hashtags.txt")
 print("[INFO] Hashtags fetched from S3.")
 
-with open(f"{ROOT_DIR}hashtags.txt") as file:
+with open(f"{ROOT_DIR}{today}/hashtags.txt") as file:
     trends_ls = file.readlines()
     trends_ls = [line.rstrip() for line in trends_ls]
 

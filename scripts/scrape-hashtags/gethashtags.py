@@ -2,6 +2,9 @@ import os
 import requests
 import tempfile
 import boto3
+import datetime
+
+today = datetime.date.today()
 
 access_token = os.environ.get("API_TOKEN")
 print(f"[INFO] Using access_token={access_token}")
@@ -48,7 +51,7 @@ def get_hashtags():
     with tempfile.TemporaryFile() as fp:
         fp.writelines([str.encode(x + "\n") for x in trends_ls])
         fp.seek(0)
-        bucket.upload_fileobj(fp, "hashtags.txt")
+        bucket.upload_fileobj(fp, f"{today}/hashtags.txt")
 
     print("[INFO] Uploaded hashtags to S3.")
 
