@@ -42,6 +42,7 @@ class IacStack(cdk.Stack):
             minv_cpus = 0,
             security_groups = [sg],
             type=aws_batch.ComputeResourceType("SPOT"),
+            bid_percentage = 60,
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
