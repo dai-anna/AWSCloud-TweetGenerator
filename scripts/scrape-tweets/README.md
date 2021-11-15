@@ -1,1 +1,1 @@
-This directory contains the working scripts to fetch hashtags and scrape tweets.
+This directory contains the working scripts to scrape hashtags.

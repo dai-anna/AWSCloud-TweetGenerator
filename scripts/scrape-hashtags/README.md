@@ -1,0 +1,1 @@
+This directory contains the working scripts to fetch hashtags.
