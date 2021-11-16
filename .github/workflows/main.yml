@@ -28,12 +28,10 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: make install
-      
-      # Environment variables
-      - name: Environment variables
-        env: 
-          API_TOKEN = ${{ secrets.API_TOKEN }}
 
       # Run test suite
       - name: pytest
+        env: 
+          API_TOKEN = ${{ secrets.API_TOKEN }}
         run: make test
+
