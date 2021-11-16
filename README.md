@@ -8,6 +8,14 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 - Scrapes tweets associated to the hashtags
 - Uses generative text model to fabricate artificial tweets about trending topics
 
+## Project Architecture
+[INSERT ARCHITECTURE DIAGRAM]
+
+## Frontend
+<div align="center">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/58488209/141659113-eff3e422-1889-4351-84c2-5c07dad951e1.png">
+</div>
+
 
 ## Environment Setup
 ### Install Dependencies
@@ -28,11 +36,3 @@ The project requires four environment variables to be set:
 | `ACCESS_KEY_ID` | Your AWS Access Key ID |
 | `SECRET_ACCESS_KEY` | Your AWS Secret Access Key |
 
-
-## Project Architecture
-[INSERT ARCHITECTURE DIAGRAM]
-
-## Frontend
-<div align="center">
-<img width="600" alt="image" src="https://user-images.githubusercontent.com/58488209/141659113-eff3e422-1889-4351-84c2-5c07dad951e1.png">
-</div>
