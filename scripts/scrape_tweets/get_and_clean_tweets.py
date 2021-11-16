@@ -14,7 +14,7 @@ logging.basicConfig(
 )
 
 today = datetime.date.today()
-today = "2021-11-15"  # Hardcode
+# today = "2021-11-15"  # Hardcode
 
 
 ROOT_DIR = "./"
