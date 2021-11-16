@@ -5,7 +5,11 @@ import numpy as np
 import boto3
 import os
 import joblib
-from train import build_proba_dict, get_pdist_from_proba_dict
+try:
+    from train import build_proba_dict, get_pdist_from_proba_dict
+except ModuleNotFoundError:
+    from scripts.text_generator.train import build_proba_dict, get_pdist_from_proba_dict
+    
 import tempfile
 
 ROOT_DIR = "./"

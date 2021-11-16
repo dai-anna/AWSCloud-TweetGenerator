@@ -14,7 +14,7 @@ install:
 	pip install -r requirements.txt
 
 run-frontend:
-	uvicorn --app-dir application/ app:app --reload --host 0.0.0.0 --port 8080
+	uvicorn --app-dir scripts/application/ app:app --reload --host 0.0.0.0 --port 8080
 
 test:
 	pytest tests/

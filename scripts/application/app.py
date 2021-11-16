@@ -4,8 +4,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 import os
+import sys
 
-print(os.system("ls -l"))
+# print(os.system("ls -l"))
 
 if os.getenv("IS_DOCKER") is not None:
     print(os.system("ls -l templates"))
@@ -13,6 +14,8 @@ if os.getenv("IS_DOCKER") is not None:
     templates = Jinja2Templates(directory="templates")
     from inference import finish_sentence, corpus
 else:
+    sys.path.append(".")
+    from scripts.text_generator.inference import finish_sentence, corpus
     print("Running locally")
     templates = Jinja2Templates(directory="scripts/application/templates")
 
@@ -23,6 +26,10 @@ app = FastAPI()
 
 def get_available_hashtags():
     return ["Select trending topic...", "#python", "#fastapi", "#swagger"]  # dummy data
+
+
+def get_inferred_tweet():
+    pass
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -36,6 +43,14 @@ async def read_item(request: Request, userinput: Optional[str] = Form(None)):
     except:
         result = "Your tweet will appear here."
         selected_topic = get_available_hashtags()[0]
+
+    # do inference
+    try:
+        result = finish_sentence("Wow! I think that was".split(), n=3, corpus=corpus, max_len=25)
+        result = " ".join(result)
+    except:
+        result = "[ERROR] Inference did not work :("
+
 
     params = {
         "request": request,  # do not change, has to be passed
