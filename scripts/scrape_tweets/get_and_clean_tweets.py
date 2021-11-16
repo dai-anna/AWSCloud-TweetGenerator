@@ -5,9 +5,16 @@ import boto3
 import pandas as pd
 import re
 import tempfile
+import logging
 
+logging.basicConfig(
+    format="[%(levelname)s] %(asctime)s - %(message)s",
+    level=logging.INFO,
+    handlers=[logging.StreamHandler(), logging.FileHandler("log_get_and_clean_tweets.log")],
+)
 
 today = datetime.date.today()
+today = "2021-11-15"  # Hardcode
 
 
 ROOT_DIR = "./"
@@ -27,7 +34,7 @@ bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
 def download_hashtag_file():
     """Downloads hashtags file from s3"""
     bucket.download_file(f"{today}/hashtags.txt", "hashtags.txt")
-    print("[INFO] Hashtags fetched from S3.")
+    logging.info("Hashtags fetched from S3.")
 
 
 def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
@@ -47,9 +54,9 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
 
         c.Store_csv = True
         c.Output = f"twint_out_{idx}.csv"
-        print(f"[INFO] Starting {idx}: {trend} scrape")
+        logging.info(f"Starting {idx}: {trend} scrape")
         twint.run.Search(c)
-        print(f"[INFO] Finished {idx}: {trend} scrape")
+        logging.info(f"Finished {idx}: {trend} scrape")
 
 
 ###############################################
@@ -91,14 +98,14 @@ def get_tweets_and_clean():
     all_tweets_raw = pd.concat(load_files(tweet_files, lines))
     all_tweets_raw = clean_tweets_df(all_tweets_raw)
 
-    print(f"[INFO] Starting Clean S3 upload")
+    logging.info(f"Starting Clean S3 upload")
     for idx in all_tweets_raw["tag_idx"].unique():
         with tempfile.TemporaryFile() as fp:
             export = all_tweets_raw.loc[all_tweets_raw["tag_idx"] == idx, "tweet"].to_list()
             fp.writelines([str.encode(x + "\n") for x in export])
             fp.seek(0)
             bucket.upload_fileobj(fp, f"{today}/clean_out_{idx}.txt")
-    print(f"[INFO] Ending Clean S3 upload")
+    logging.info(f"Ending Clean S3 upload")
 
 
 if __name__ == "__main__":
