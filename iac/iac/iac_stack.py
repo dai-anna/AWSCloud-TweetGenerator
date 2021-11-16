@@ -22,7 +22,7 @@ class IacStack(cdk.Stack):
         iamrole = aws_iam.Role(
             self,
             id = "iac_iamrole",
-            assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"),
+            assumed_by = aws_iam.ServicePrincipal("batch.amazonaws.com"),
         )
         vpc = aws_ec2.Vpc(
             self,
@@ -55,12 +55,12 @@ class IacStack(cdk.Stack):
             security_groups = [sg],
             type=aws_batch.ComputeResourceType("SPOT"),
             bid_percentage = 60,
-            instance_role = iamrole.role_arn
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
             id='batch-compute-env',
             compute_resources=batch_compute_resources,
+            service_role = iamrole,
         )
         q_batch_compute_env = aws_batch.JobQueueComputeEnvironment(
             compute_environment = aws_batch.ComputeEnvironment.from_compute_environment_arn(
@@ -75,44 +75,43 @@ class IacStack(cdk.Stack):
             "batch-queue",
             compute_environments = [q_batch_compute_env],
         )
-        batch_job_container = aws_batch.JobDefinitionContainer(
-            image = aws_ecs.RepositoryImage(image_name="moritzwilksch/dukerepo:datacollector"),
-            memory_limit_mib = 512,
-            #command = ,
-            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucket_name}
-        )
-        batch_job_definition = aws_batch.JobDefinition(
-            self,
-            id = "batch_jd",
-            container = batch_job_container,
-        )
+        container_images = ["moritzwilksch/dukerepo:hashtagcollector" ,"moritzwilksch/dukerepo:datacollector"]
+        batch_job_containers = [
+            aws_batch.JobDefinitionContainer(
+                image = aws_ecs.RepositoryImage(image_name = ci),
+                memory_limit_mib = 512,
+                environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucket_name}
+            ) for ci in container_images
+        ]
+        batch_job_definitions = [
+            aws_batch.JobDefinition(
+                self,
+                id = "batch_jd" + str(i+1),
+                container = bjc,
+            ) for i,bjc in enumerate(batch_job_containers)
+        ]
         
-        schedule1 = aws_events.Schedule.cron(hour="3", minute="50")#1,31
-        target1 = aws_events_targets.BatchJob(
-            job_queue_arn = batch_queue.job_queue_arn,
-            job_queue_scope = q_batch_compute_env.compute_environment,
-            job_definition_arn = batch_job_definition.job_definition_arn,
-            job_definition_scope = q_batch_compute_env.compute_environment,
-            attempts = 2,
-        )
-        #schedule2 = aws_events.Schedule.cron(hour="6", minute="5")
-        
-        #target2 = aws_events_targets.BatchJob(
-        #)
-        
-        cronjob1 = aws_events.Rule(
-            self,
-            id="cronjob1",
-            schedule=schedule1,
-            targets=[target1]
-        )
-        #cronjob2 = aws_events.Rule(
-        #    self,
-        #    id="cronjob2",
-        #    schedule=schedule2,
-        #    targets=[target2]
-        #)
-        #    
+        schedulers = [
+            aws_events.Schedule.cron(hour="1", minute="31"),
+            aws_events.Schedule.cron(hour="3", minute="50"),
+        ]
+        targets = [
+            aws_events_targets.BatchJob(
+                job_queue_arn = batch_queue.job_queue_arn,
+                job_queue_scope = q_batch_compute_env.compute_environment,
+                job_definition_arn = bjd.job_definition_arn,
+                job_definition_scope = q_batch_compute_env.compute_environment,
+                attempts = 2,
+            ) for bjd in batch_job_definitions
+        ]
+        cronjobs = [
+            aws_events.Rule(
+                self,
+                id="cronjob"+str(i+1),
+                schedule=schedulers[i],
+                targets=[targets[i]]
+            ) for i in [0,1]
+        ]
         bucket.grant_read_write(
             identity= iamrole,
         )
