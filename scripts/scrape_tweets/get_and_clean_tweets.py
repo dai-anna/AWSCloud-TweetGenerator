@@ -6,7 +6,9 @@ import pandas as pd
 import re
 import tempfile
 
+
 today = datetime.date.today()
+
 
 ROOT_DIR = "./"
 
@@ -20,8 +22,12 @@ s3 = boto3.resource(
 
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-bucket.download_file(f"{today}/hashtags.txt", "hashtags.txt")
-print("[INFO] Hashtags fetched from S3.")
+
+
+def download_hashtag_file():
+    """Downloads hashtags file from s3"""
+    bucket.download_file(f"{today}/hashtags.txt", "hashtags.txt")
+    print("[INFO] Hashtags fetched from S3.")
 
 
 def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
@@ -49,7 +55,7 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
 ###############################################
 
 
-def load_files(filenames, lines):
+def load_files(filenames: list[str], lines: list[str]):
     for f in filenames:
         if f.startswith("twint_out"):
             tag = lines[int(re.findall("\d+", f)[0])]
@@ -64,6 +70,7 @@ def load_files(filenames, lines):
 
 
 def clean_tweets_df(all_tweets_raw: pd.DataFrame):
+    """Cleans tweets data frame. It should have the column `tweets`."""
     url_mentions = re.compile(r"(@\S+) | (https?:\/\/.+)")
 
     all_tweets_raw["tweet"] = (
@@ -95,5 +102,6 @@ def get_tweets_and_clean():
 
 
 if __name__ == "__main__":
+    download_hashtag_file()
     scrape_tweets_from_hashtags()
     get_tweets_and_clean()

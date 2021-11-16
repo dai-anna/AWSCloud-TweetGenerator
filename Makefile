@@ -1,6 +1,6 @@
 # Define Docker contexts
-HASHTAGCOLLECTOR_CONTEXT=./scripts/scrape-hashtags
-DATACOLLECTOR_CONTEXT=./scripts/scrape-tweets
+HASHTAGCOLLECTOR_CONTEXT=./scripts/scrape_hashtags
+DATACOLLECTOR_CONTEXT=./scripts/scrape_tweets
 FRONTEND_CONTEXT=./scripts/application
 
 # Define DockerHub locations
