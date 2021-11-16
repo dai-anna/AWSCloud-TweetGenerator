@@ -2,22 +2,20 @@ FROM python:3.9-slim-buster
 
 WORKDIR /app
 
-COPY ./gettweets.py /app/gettweets.py
-COPY ./gettweets.py /app/cleantweets.py
-COPY ./scraping_pipeline.sh /app/scraping_pipeline.sh
-COPY ./requirements_scrapetweets.txt /app/requirements_scrapetweets.txt
-
 ENV TZ=America/New_York
 
 # install git for twint install
-RUN apt-get update \
+RUN apt-get update --no-install-recommends\
     && apt-get install -y --no-install-recommends git \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
+COPY ./requirements_scrapetweets.txt /app/requirements_scrapetweets.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r /app/requirements_scrapetweets.txt
 
-RUN pip install --upgrade pip \
-    && pip install -r /app/requirements_scrapetweets.txt
+COPY get_and_clean_tweets.py /app/get_and_clean_tweets.py
 
 
-ENTRYPOINT ["/bin/bash", "/app/scraping_pipeline.sh"]
+ENTRYPOINT ["python"]
+CMD ["/app/get_and_clean_tweets.py"]

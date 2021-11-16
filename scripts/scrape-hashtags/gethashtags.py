@@ -26,8 +26,9 @@ s3 = boto3.resource(
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
 
+
 def get_hashtags():
-    """ Scrapes to 10 trending hashtags in the US. """
+    """Scrapes to 10 trending hashtags in the US."""
     response = requests.request("GET", url, headers=headers, data=payload)
 
     if not response.ok:
@@ -55,7 +56,7 @@ def get_hashtags():
 
     print("[INFO] Uploaded hashtags to S3.")
 
-
     return trends_ls
+
 
 get_hashtags()

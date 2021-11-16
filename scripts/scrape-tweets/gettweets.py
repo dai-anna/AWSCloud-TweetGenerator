@@ -28,11 +28,11 @@ s3 = boto3.resource(
 
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-bucket.download_fileobj("hashtags.txt", f"{ROOT_DIR}{today}/hashtags.txt")
+bucket.download_file(f"{today}/hashtags.txt", "hashtags.txt")
 print("[INFO] Hashtags fetched from S3.")
 
-with open(f"{ROOT_DIR}{today}/hashtags.txt") as file:
-    trends_ls = file.readlines()
+with open(f"{ROOT_DIR}/hashtags.txt") as f:
+    trends_ls = f.readlines()
     trends_ls = [line.rstrip() for line in trends_ls]
 
 
@@ -54,3 +54,4 @@ for idx, trend in enumerate(trends_ls):
     # print(f"[INFO] Starting S3 upload")
     # bucket.upload_file(f"twint_out_{idx}.csv", f"twint_out_{idx}.csv")
     # print(f"[INFO] Finished S3 upload")
+

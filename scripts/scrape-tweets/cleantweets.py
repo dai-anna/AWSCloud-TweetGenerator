@@ -9,7 +9,7 @@ today = datetime.date.today()
 
 ROOT_DIR = "./"
 
-filePath = f"{ROOT_DIR}{today}/hashtags.txt"
+filePath = f"{ROOT_DIR}/hashtags.txt"
 
 if os.path.exists(filePath):
     os.remove(filePath)
@@ -25,21 +25,21 @@ s3 = boto3.resource(
 
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-bucket.download_file("hashtags.txt", f"{ROOT_DIR}{today}/hashtags.txt")
+bucket.download_file(f"{today}/hashtags.txt", "hashtags.txt")
 print("[INFO] Hashtags fetched from S3.")
 
-with open(f"{ROOT_DIR}hashtags.txt") as file:
-    lines = file.readlines()
+with open(f"{ROOT_DIR}hashtags.txt") as f:
+    lines = f.readlines()
     lines = [line.rstrip() for line in lines]
 
 tweet_files = os.listdir()
 
 def load_files(filenames):
-    for file in filenames:
-        if file.startswith('twint_out'):
-            tag = lines[int(re.findall("\d+",file)[0])]
-            tag_idx = int(re.findall("\d+",file)[0])
-            df = pd.read_csv(file, sep=",", usecols = ['date', 'tweet', 'language'])
+    for f in filenames:
+        if f.startswith('twint_out'):
+            tag = lines[int(re.findall("\d+",f)[0])]
+            tag_idx = int(re.findall("\d+",f)[0])
+            df = pd.read_csv(f, sep=",", usecols = ['date', 'tweet', 'language'])
             df = df.loc[df['language']=='en'].copy()
             df.drop("language",axis=1,inplace=True)
             df["tag"] = tag.strip("#")
