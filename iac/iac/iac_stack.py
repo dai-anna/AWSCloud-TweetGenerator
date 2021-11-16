@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_ecs,
     aws_s3,
     aws_events,
+    aws_iam,
     aws_events_targets,
 )
 import os 
@@ -17,6 +18,11 @@ class IacStack(cdk.Stack):
         bucket = aws_s3.Bucket(
             self,
             id = "mainbucket",
+        )
+        iamrole = aws_iam.Role(
+            self,
+            id = "iac_iamrole",
+            assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"),
         )
         vpc = aws_ec2.Vpc(
             self,
@@ -49,6 +55,7 @@ class IacStack(cdk.Stack):
             security_groups = [sg],
             type=aws_batch.ComputeResourceType("SPOT"),
             bid_percentage = 60,
+            instance_role = iamrole.role_arn
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
@@ -105,10 +112,9 @@ class IacStack(cdk.Stack):
         #    schedule=schedule2,
         #    targets=[target2]
         #)
-        
-        #bucket.grant_read_write(
-        #    identity= ,
-        #    objects_key_pattern = {}
-        #)
+        #    
+        bucket.grant_read_write(
+            identity= iamrole,
+        )
         pass
     pass
