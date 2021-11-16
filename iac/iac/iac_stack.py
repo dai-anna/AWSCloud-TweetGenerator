@@ -23,6 +23,9 @@ class IacStack(cdk.Stack):
             self,
             id = "iac_iamrole",
             assumed_by = aws_iam.ServicePrincipal("batch.amazonaws.com"),
+            managed_policies = [
+                aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSBatchServiceRole"),
+            ]
         )
         vpc = aws_ec2.Vpc(
             self,
