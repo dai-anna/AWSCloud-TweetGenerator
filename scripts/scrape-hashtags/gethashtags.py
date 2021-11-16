@@ -58,5 +58,6 @@ def get_hashtags():
 
     return trends_ls
 
+if __name__ == "__main__":
+    get_hashtags()
 
-get_hashtags()
