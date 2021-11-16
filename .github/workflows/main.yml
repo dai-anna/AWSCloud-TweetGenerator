@@ -32,6 +32,6 @@ jobs:
       # Run test suite
       - name: pytest
         env: 
-          API_TOKEN = ${{ secrets.API_TOKEN }}
+          API_TOKEN=${{ secrets.API_TOKEN }}
         run: make test
 
