@@ -4,7 +4,10 @@ WORKDIR /app
 
 COPY ./gettweets.py /app/gettweets.py
 COPY ./gettweets.py /app/cleantweets.py
+COPY ./scraping_pipeline.sh /app/scraping_pipeline.sh
 COPY ./requirements_scrapetweets.txt /app/requirements_scrapetweets.txt
+
+ENV TZ=America/New_York
 
 # install git for twint install
 RUN apt-get update \
@@ -17,5 +20,4 @@ RUN pip install --upgrade pip \
     && pip install -r /app/requirements_scrapetweets.txt
 
 
-ENTRYPOINT ["python"]
-CMD ["/app/gettweets.py", "/app/cleantweets.py"]
+ENTRYPOINT ["/bin/bash", "/app/scraping_pipeline.sh"]

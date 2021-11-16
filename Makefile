@@ -46,7 +46,7 @@ docker-build-push:
 docker-run:
 	docker run -d --name datacollector --env-file $(DATACOLLECTOR_CONTEXT)/env.list datacollector
 
-docker-run-debug:
+docker-run-debug: docker-clean
 	docker run -it --name datacollector --env-file $(DATACOLLECTOR_CONTEXT)/env.list datacollector
 	
 docker-clean:

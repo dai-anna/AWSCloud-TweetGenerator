@@ -28,7 +28,7 @@ s3 = boto3.resource(
 
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-bucket.download_file("hashtags.txt", f"{ROOT_DIR}{today}/hashtags.txt")
+bucket.download_fileobj("hashtags.txt", f"{ROOT_DIR}{today}/hashtags.txt")
 print("[INFO] Hashtags fetched from S3.")
 
 with open(f"{ROOT_DIR}{today}/hashtags.txt") as file:
