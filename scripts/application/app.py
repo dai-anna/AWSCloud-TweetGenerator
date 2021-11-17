@@ -49,7 +49,7 @@ def get_all_tweet_seeds(hashtags: list[str]):
     tweet_seeds = dict()
 
     for hashtag in hashtags:
-        sep_tweets: list[str] = " ".join(corpora[hashtag]).split(". ")
+        sep_tweets: list[str] = " ".join(corpora.get(hashtag, "There is no data. There is no data.".split(". "))).split(". ")
         tweet_seeds[hashtag] = [
             " ".join(tweet.split()[:4]) for tweet in sep_tweets if len(tweet.split()) > 6
         ]
@@ -70,9 +70,9 @@ def get_inferred_tweet(selected_hashtag: str = None):
     result = finish_sentence(
         seed_str.split(),
         n=3,
-        corpus=corpora[selected_hashtag],
+        corpus=corpora.get(selected_hashtag, "There is no data. There is no data.".split()),
         max_len=25,
-        proba_dict=models[selected_hashtag],
+        proba_dict=models.get(selected_hashtag, {}),
     )
     result = " ".join(result)
     result = result.replace(" ,", ",").replace(" .", ".")  # rm space around punctuation
@@ -85,9 +85,9 @@ def get_inferred_tweet(selected_hashtag: str = None):
     return result
 
 
-def get_models_for_hashtags(hashtags: list[str]):
+def get_models_for_hashtags(hashtags: list[str], most_current_date: str):
     num_regex = re.compile(r"\/model_(?P<num>\d+).joblib")
-    model_names = [obj.key for obj in bucket.objects.all() if "model_" in obj.key]
+    model_names = [obj.key for obj in bucket.objects.filter(Prefix=f"{most_current_date}/") if "model_" in obj.key]
     # print(f"Found the following models: {model_names}")
 
     models = dict()
@@ -120,9 +120,9 @@ def get_models_for_hashtags(hashtags: list[str]):
 most_current_date = get_most_current_date_in_s3()
 print(f"{most_current_date = }")
 hashtags = get_available_hashtags(most_current_date)
-corpora, _ = get_corpora_for_hashtags(hashtags)  # we dont use the corpus numbers here
+corpora, _ = get_corpora_for_hashtags(hashtags, most_current_date)  # we dont use the corpus numbers here
 tweet_seeds: dict = get_all_tweet_seeds(hashtags)
-models: dict = get_models_for_hashtags(hashtags)
+models: dict = get_models_for_hashtags(hashtags, most_current_date)
 ##########################################
 
 
