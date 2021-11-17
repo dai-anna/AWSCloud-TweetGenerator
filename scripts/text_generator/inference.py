@@ -5,11 +5,12 @@ import numpy as np
 import boto3
 import os
 import joblib
+
 try:
     from train import build_proba_dict, get_pdist_from_proba_dict
 except ModuleNotFoundError:
     from scripts.text_generator.train import build_proba_dict, get_pdist_from_proba_dict
-    
+
 import tempfile
 
 ROOT_DIR = "./"
@@ -32,18 +33,21 @@ with tempfile.TemporaryFile() as f:
 print("[INFO] Model downloaded from S3.")
 # proba_dict = joblib.load(f"{ROOT_DIR}artifacts/proba_dict.joblib")
 
-corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
-corpus = nltk.word_tokenize(corpus.lower())
-
 
 def finish_sentence(
-    sentence: List[str], n: int, corpus: List[str], deterministic=False, max_len: int = 15
+    sentence: List[str],
+    n: int,
+    corpus: list[str],
+    deterministic=False,
+    max_len: int = 15,
+    proba_dict: dict = None,
 ):
     """Finish sentence using n-grams built on corpus."""
 
     # Sample next words
     response = sentence.copy()
     for _ in range(max_len):
+        # print(f"PREDICTING num #{_}")
         base = response[-n + 1 :]
 
         # Get distribution over successors. Includes backoff.
@@ -55,15 +59,13 @@ def finish_sentence(
             except:
                 generated_word = "<NA>"
         else:
-            generated_word = np.random.choice(
-                list(p_dist.keys()), p=list(p_dist.values())
-            )
+            generated_word = np.random.choice(list(p_dist.keys()), p=list(p_dist.values()))
 
         # print(generated_word)
         response.append(generated_word)
 
-        if any([x in response for x in ".!?"]):
-            break
+        # if any([x in response for x in ".!?"]):
+        #     break
 
     return response
 
@@ -73,4 +75,11 @@ def finish_sentence(
 # Backoff test
 
 if __name__ == "__main__":
-    print(finish_sentence("when she saw".split(), n=3, corpus=corpus, max_len=25))
+    corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
+    corpus = nltk.word_tokenize(corpus.lower())
+    print(corpus)
+    print(
+        finish_sentence(
+            "when she saw".split(), n=3, corpus=corpus, max_len=25, proba_dict=proba_dict
+        )
+    )

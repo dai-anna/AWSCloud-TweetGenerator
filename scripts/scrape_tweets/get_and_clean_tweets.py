@@ -47,7 +47,7 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         c = twint.Config()
         c.Search = "#" + trend  # your search here
         c.Lang = "en"
-        c.Since = (datetime.datetime.now() - datetime.timedelta(minutes=10)).strftime(
+        c.Since = (datetime.datetime.now() - datetime.timedelta(hours=10)).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
         c.Until = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
