@@ -13,7 +13,7 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 
 ## Frontend
 <div align="center">
-<img width="600" alt="image" src="https://user-images.githubusercontent.com/58488209/141659113-eff3e422-1889-4351-84c2-5c07dad951e1.png">
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/58488209/142140632-2ed40fef-075a-4639-8d60-aebdc615c046.png">
 </div>
 
 
