@@ -121,7 +121,9 @@ def get_corpora_for_hashtags(hashtags: list[str]):
     print(f"Found the following corpora: {corpora_names}")
 
     corpora = dict()
-    print(corpora_names)
+    corpora_numbers = []
+
+    # print(corpora_names)
     for corpus_name in corpora_names:
         try:
             number = int(num_regex.search(corpus_name)["num"])
@@ -129,7 +131,8 @@ def get_corpora_for_hashtags(hashtags: list[str]):
             print(f"[ERROR] Could not decode number in file name, defaulting to zero.")
             number = 0
 
-        print(f"{number = }")
+        # print(f"{number = }")
+        corpora_numbers.append(number)
 
         with io.BytesIO() as f:
             bucket.download_fileobj(f"{corpus_name}", f)
@@ -139,7 +142,7 @@ def get_corpora_for_hashtags(hashtags: list[str]):
             ).split()
 
     # print(corpora)
-    return corpora  # every corpus in corpora is A SINGLE string containing tweets separated by .
+    return corpora, corpora_numbers  # every corpus in corpora is A SINGLE string containing tweets separated by .
 
 
 if __name__ == "__main__":

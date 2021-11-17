@@ -53,6 +53,7 @@ def get_all_tweet_seeds(hashtags: list[str]):
         tweet_seeds[hashtag] = [
             " ".join(tweet.split()[:4]) for tweet in sep_tweets if len(tweet.split()) > 6
         ]
+    
     return tweet_seeds
 
 
@@ -79,6 +80,7 @@ def get_inferred_tweet(selected_hashtag: str = None):
     result = result.replace(selected_hashtag.lower(), "")
     result = result + f" #{''.join(selected_hashtag.split())}"
     result = result.replace("##", "#")  # rm double hashtags
+    result = result.replace("&amp;", "&")  # rm double hashtags
 
     return result
 
@@ -118,7 +120,7 @@ def get_models_for_hashtags(hashtags: list[str]):
 most_current_date = get_most_current_date_in_s3()
 print(f"{most_current_date = }")
 hashtags = get_available_hashtags(most_current_date)
-corpora: dict = get_corpora_for_hashtags(hashtags)
+corpora, _ = get_corpora_for_hashtags(hashtags)  # we dont use the corpus numbers here
 tweet_seeds: dict = get_all_tweet_seeds(hashtags)
 models: dict = get_models_for_hashtags(hashtags)
 ##########################################
@@ -148,6 +150,7 @@ async def main_page(request: Request):
         "hashtags": get_available_hashtags(most_current_date),  # populates dropdown
         "selected_topic": selected_topic,  # populates dropdown
         "result": result,
+        "most_current_date": most_current_date,
     }
 
     return templates.TemplateResponse("index.html", params)

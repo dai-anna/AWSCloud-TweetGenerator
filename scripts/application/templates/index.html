@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <title>Hello, world!</title>
+    <title>Tweet Generator</title>
 </head>
 
 <body class="bg-light">
@@ -27,14 +27,27 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
 
-    <div.row class="container" style="max-width: 100%;">
+    <div class="container" style="max-width: 100%;">
         <div class="row"></div>
-        <h2 class="text-center" style="margin-top: 0.5em; margin-bottom: 0.5em;">Non-Ordinary Automated Helper for<br>Generating Intelligently Fabricated Tweets</h2>
+        <h2 class="text-center" style="margin-top: 0.5em; margin-bottom: 0.5em;">Non-Ordinary Automated Helper
+            for Generating<br>Intelligently Fabricated Tweets</h2>
 
         <div class="row">
             <div class="col"></div>
-            <div class="col-9">
-                <div class="card shadow p-3 mb-5 bg-white rounded">
+            <div class="col-10">
+                <hr>
+                <p style="text-align: center;">
+                    This application uses an AWS-based data scraping and processing pipeline to generate artificial tweets for currently trending hashtags with a Hidden Markov Model.
+                <br>Want to see the source code? Find the GitHub repo <a href="https://github.com/dai-anna/AWSCloud-TweetGenerator">here!</a></p>
+                <hr style="margin-bottom: 4em;">
+            </div>
+            <div class="col"></div>
+        </div>
+
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-10">
+                <div class="card shadow p-3 mb-4 bg-white rounded">
                     <div class="card-body">
                         <h5 class="card-title">Choose Trending Topic</h5>
 
@@ -45,15 +58,19 @@
                         </div>
 
                         <form id="inputform">
-                            <select class="custom-select" style="margin-bottom: 1em;" name="userinput" form="inputform">
-                                {% for ht in hashtags %}
-                                {% if ht != selected_topic %}
-                                <option value="{{ht}}">{{ht}}</option>
-                                {% else %}
-                                <option value="{{ht}}" selected>{{ht}}</option>
-                                {% endif %}
-                                {% endfor %}
-                            </select>
+                            <div class="form-group" style="margin-bottom: 1em;">
+                                <select class="custom-select" name="userinput"
+                                    form="inputform">
+                                    {% for ht in hashtags %}
+                                    {% if ht != selected_topic %}
+                                    <option value="{{ht}}">{{ht}}</option>
+                                    {% else %}
+                                    <option value="{{ht}}" selected>{{ht}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">Last updated: {{most_current_date}}</small>
+                            </div>
                             <input type="submit" class="btn btn-primary" value="Submit">
                         </form>
 
@@ -67,9 +84,9 @@
 
         <div class="row">
             <div class="col"></div>
-            <div class="col-9">
+            <div class="col-10">
                 <div style="text-align: center;" class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor"
                         class="bi bi-arrow-down" viewBox="0 0 16 16">
                         <path fill-rule="evenodd"
                             d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z" />
@@ -82,7 +99,7 @@
 
         <div class="row">
             <div class="col"></div>
-            <div class="col-9">
+            <div class="col-10">
                 <div class="card shadow p-3 mb-5 bg-white rounded">
                     <dif class="card-body">
                         <h5 class="card-title">Result</h5>
@@ -107,7 +124,7 @@
 
 
 
-    <p align="center" style="color: #AAAAAA;">&copy; Us, 2021</p>
+    <p align="center" style="color: #AAAAAA;">Built with lots of <span style='font-size: 1.3em;'>☕️</span> @Duke</p>
 </body>
 
 </html>
