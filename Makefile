@@ -60,7 +60,6 @@ docker/run-frontend:
 	docker run -d --name frontend --env-file $(DATACOLLECTOR_CONTEXT)/env.list -p 8080:8080 frontend
 
 docker/clean-frontend:
-	docker stop frontend
 	docker rm -f frontend
 
 docker/build-push-frontend:

@@ -2,14 +2,16 @@ FROM python:3.9-slim-buster
 
 WORKDIR /application
 
-COPY application/ /application
+COPY application/requirements_frontend.txt /application/requirements_frontend.txt
 RUN pip install --no-cache-dir -r /application/requirements_frontend.txt
-COPY text_generator/inference.py /application/inference.py
-COPY text_generator/train.py /application/train.py
 
 ENV IS_DOCKER=1
 
-RUN python -m nltk.downloader gutenberg \
-    && python -m nltk.downloader punkt
+RUN python -m nltk.downloader punkt
+    # && python -m nltk.downloader punkt
+
+COPY application/ /application
+COPY text_generator/inference.py /application/inference.py
+COPY text_generator/train.py /application/train.py
 
 ENTRYPOINT uvicorn app:app --host 0.0.0.0 --port 8080

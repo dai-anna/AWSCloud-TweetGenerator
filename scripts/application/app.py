@@ -14,14 +14,19 @@ import joblib
 
 DATE_REGEX = re.compile(r"\d\d\d\d-\d\d-\d\d")
 
+# Detect docker env and use different imports
 if os.getenv("IS_DOCKER") is not None:
-    print(os.system("ls -l templates"))
-    print("Running in Docker")
     templates = Jinja2Templates(directory="templates")
     from inference import finish_sentence
+    from train import get_most_current_date_in_s3, get_available_hashtags, get_corpora_for_hashtags
 else:
     sys.path.append(".")
     from scripts.text_generator.inference import finish_sentence
+    from scripts.text_generator.train import (
+        get_most_current_date_in_s3,
+        get_available_hashtags,
+        get_corpora_for_hashtags,
+    )
 
     print("Running locally")
     templates = Jinja2Templates(directory="scripts/application/templates")
@@ -38,14 +43,6 @@ s3 = boto3.resource(
 
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-
-
-def get_available_hashtags(date_aka_folder: str):
-    with io.BytesIO() as f:
-        bucket.download_fileobj(f"{date_aka_folder}/hashtags.txt", f)
-        f.seek(0)
-        hashtags = f.read().decode("utf-8").splitlines()
-    return hashtags
 
 
 def get_all_tweet_seeds(hashtags: list[str]):
@@ -67,9 +64,9 @@ def get_inferred_tweet(selected_hashtag: str = None):
     if selected_hashtag is None:
         return "Please select a hashtag from the list!"
 
-    print(f"{tweet_seeds = }")
+    # print(f"{tweet_seeds = }")
     seed_str = random.choice(tweet_seeds[selected_hashtag])
-    print(f"Using seed: {seed_str}")
+    # print(f"Using seed: {seed_str}")
 
     result = finish_sentence(
         seed_str.split(),
@@ -88,44 +85,10 @@ def get_inferred_tweet(selected_hashtag: str = None):
     return result
 
 
-def get_most_current_date_in_s3():
-    """Returns the most current folder name in `bucket`"""
-    return max([obj.key for obj in bucket.objects.all() if DATE_REGEX.match(obj.key)]).split("/")[0]
-
-
-def get_corpora_for_hashtags(hashtags: list[str]):
-    """Returns all available corpora in `bucket/most_current_date`"""
-
-    num_regex = re.compile(r"\/clean_out_(?P<num>\d+).txt")
-    corpora_names = [obj.key for obj in bucket.objects.all() if "clean_out_" in obj.key]
-    print(f"Found the following corpora: {corpora_names}")
-
-    corpora = dict()
-    print(corpora_names)
-    for corpus_name in corpora_names:
-        try:
-            number = int(num_regex.search(corpus_name)["num"])
-        except ValueError:
-            print(f"[ERROR] Could not decode number in file name, defaulting to zero.")
-            number = 0
-
-        print(f"{number = }")
-
-        with io.BytesIO() as f:
-            bucket.download_fileobj(f"{corpus_name}", f)
-            f.seek(0)
-            corpora[hashtags[number]] = ". ".join(
-                [x.decode("utf-8").strip() for x in f.readlines()]
-            ).split()
-
-    # print(corpora)
-    return corpora  # every corpus in corpora is A SINGLE string containing tweets separated by .
-
-
 def get_models_for_hashtags(hashtags: list[str]):
     num_regex = re.compile(r"\/model_(?P<num>\d+).joblib")
     model_names = [obj.key for obj in bucket.objects.all() if "model_" in obj.key]
-    print(f"Found the following models: {model_names}")
+    # print(f"Found the following models: {model_names}")
 
     models = dict()
     print(model_names)
@@ -136,7 +99,7 @@ def get_models_for_hashtags(hashtags: list[str]):
             print(f"[ERROR] Could not decode number in file name, defaulting to zero.")
             number = 0
 
-        print(f"{number = }")
+        # print(f"{number = }")
 
         try:
             with io.BytesIO() as f:
@@ -155,7 +118,7 @@ def get_models_for_hashtags(hashtags: list[str]):
 ########### INIT Environmet ##############
 # HASHTAGS = ["a", "b", "c"]
 most_current_date = get_most_current_date_in_s3()
-print(most_current_date)
+print(f"{most_current_date = }")
 hashtags = get_available_hashtags(most_current_date)
 corpora: dict = get_corpora_for_hashtags(hashtags)
 tweet_seeds: dict = get_all_tweet_seeds(hashtags)
@@ -169,7 +132,7 @@ async def main_page(request: Request):
     selected_topic = None
 
     try:
-        print(request.query_params.get("userinput"))
+        # print(request.query_params.get("userinput"))
         result = request.query_params.get("userinput")
         selected_topic = request.query_params.get("userinput")
     except:

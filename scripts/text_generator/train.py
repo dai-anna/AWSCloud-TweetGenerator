@@ -9,6 +9,7 @@ import tempfile
 import re
 import io
 
+
 ROOT_DIR = "./"
 DATE_REGEX = re.compile(r"\d\d\d\d-\d\d-\d\d")
 
@@ -83,26 +84,17 @@ def train(
     corpus: list[str],
     upload_to_s3: bool = True,
     most_current_date: str = None,
-    model_id: int = 99
+    model_id: int = 99,
 ):
     """Train model and upload to S3"""
     print("[INFO] Starting training.")
     proba_dict = build_proba_dict(n, corpus)
 
-    # S3 upload
-    # joblib.dump(proba_dict, f"{ROOT_DIR}artifacts/proba_dict.joblib")
-
     if upload_to_s3:
-        # bucket.upload_file(
-        #     f"{ROOT_DIR}artifacts/proba_dict.joblib",
-        #     f"text-generator/proba_dict.joblib",
-        # )
-
         with io.BytesIO() as f:
             joblib.dump(proba_dict, f)
             f.seek(0)
-            # bucket.upload_fileobj(f, f"{most_current_date}/model_{model_id}.joblib")
-
+            bucket.upload_fileobj(f, f"{most_current_date}/model_{model_id}.joblib")
 
         print("[INFO] Uploaded model artifacts to S3.")
     print("[INFO] Done with training.")
@@ -129,8 +121,6 @@ def get_corpora_for_hashtags(hashtags: list[str]):
     print(f"Found the following corpora: {corpora_names}")
 
     corpora = dict()
-    corpora_numbers = []
-
     print(corpora_names)
     for corpus_name in corpora_names:
         try:
@@ -138,24 +128,25 @@ def get_corpora_for_hashtags(hashtags: list[str]):
         except ValueError:
             print(f"[ERROR] Could not decode number in file name, defaulting to zero.")
             number = 0
-        corpora_numbers.append(number)
 
         print(f"{number = }")
 
         with io.BytesIO() as f:
             bucket.download_fileobj(f"{corpus_name}", f)
             f.seek(0)
-            corpora[hashtags[number]] = ". ".join([x.decode("utf-8").strip() for x in f.readlines()]).split()
+            corpora[hashtags[number]] = ". ".join(
+                [x.decode("utf-8").strip() for x in f.readlines()]
+            ).split()
 
     # print(corpora)
-    return corpora, corpora_numbers
+    return corpora  # every corpus in corpora is A SINGLE string containing tweets separated by .
 
 
 if __name__ == "__main__":
     most_current_date = get_most_current_date_in_s3()
     print(f"most current date in s3: {most_current_date}")
     hashtags = get_available_hashtags(most_current_date)
-    
+
     corpora: dict = None
     corpora_numbers: list[int] = None
     corpora, corpora_numbers = get_corpora_for_hashtags(hashtags)
