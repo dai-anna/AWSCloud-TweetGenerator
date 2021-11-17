@@ -1,3 +1,4 @@
+#This is the main code to edit to modify the stack structure.
 from aws_cdk import (
     core as cdk,
     aws_batch,
@@ -25,9 +26,26 @@ class IacStack(cdk.Stack):
             assumed_by = aws_iam.ServicePrincipal("batch.amazonaws.com"),
             managed_policies = [
                 aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSBatchServiceRole"),
+                aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
             ]
         )
-        vpc = aws_ec2.Vpc(
+        iamrole_ecs = aws_iam.Role(
+            self,
+            id = "iacecs_iamrole",
+            assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"),
+            managed_policies = [
+                aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2ContainerServiceforEC2Role"),
+                aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
+            ]
+        )
+        ecs_instance_profile = aws_iam.CfnInstanceProfile(
+            self,
+            id = "ecsInstanceProfile",
+            roles = [
+                iamrole_ecs.role_name
+            ]
+        )
+        vpc = aws_ec2.Vpc(#Only one public subnet, in only one avaiability zone, in one region. 
             self,
             id = "mainvpc",
             max_azs = 1,
@@ -38,7 +56,7 @@ class IacStack(cdk.Stack):
                 )
             ]
         )
-        i_vpc = aws_ec2.Vpc.from_vpc_attributes(self,
+        i_vpc = aws_ec2.Vpc.from_vpc_attributes(self, #this was created to be passed into sg and batch_compute_resource. may have been unnecessary and just the vpc may have sufficed
             "main-ipvc", 
             availability_zones = [i.availability_zone for i in vpc.public_subnets], 
             vpc_id = vpc.vpc_id,
@@ -58,12 +76,13 @@ class IacStack(cdk.Stack):
             security_groups = [sg],
             type=aws_batch.ComputeResourceType("SPOT"),
             bid_percentage = 60,
+            instance_role = ecs_instance_profile.attr_arn,
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,
             id='batch-compute-env',
             compute_resources=batch_compute_resources,
-            service_role = iamrole,
+            #service_role = iamrole.role_arn,
         )
         q_batch_compute_env = aws_batch.JobQueueComputeEnvironment(
             compute_environment = aws_batch.ComputeEnvironment.from_compute_environment_arn(
@@ -115,8 +134,11 @@ class IacStack(cdk.Stack):
                 targets=[targets[i]]
             ) for i in [0,1]
         ]
-        bucket.grant_read_write(
+        bucket.grant_read_write(# I don't know if this contributes anything
             identity= iamrole,
+        )
+        bucket.grant_read_write(
+            identity = iamrole_ecs
         )
         pass
     pass
