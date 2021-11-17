@@ -7,6 +7,7 @@ from scripts.scrape_tweets.get_and_clean_tweets import clean_tweets_df
 
 
 def test_tweet_cleaning():
+    """ Tests data cleaning and emoji removal on stub data """
     with open("tests/stub_data/example_tweet.txt", "r") as f:
         stub_tweet = f.read()
 

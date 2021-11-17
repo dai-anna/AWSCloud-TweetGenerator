@@ -3,6 +3,7 @@ import os
 
 
 def test_hashtag_endpoint_live():
+    """ Tests whether Twitter endpoint is alive and works with auth token"""
     access_token = os.environ.get("API_TOKEN")
 
     url = "https://api.twitter.com/1.1/trends/place.json?id=23424977"
