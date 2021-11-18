@@ -9,7 +9,7 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 - Uses generative text model to fabricate artificial tweets about trending topics
 
 ## Project Architecture
-![Architectural_diagram](https://user-images.githubusercontent.com/89488845/142439684-d836c826-cfcc-43f5-aeed-07147f6eead8.png)
+![Architectural_diagram](https://user-images.githubusercontent.com/89488845/142448447-08a96b23-5a26-4025-a501-71016c9fdfb4.png)
 
 ## Frontend
 <div align="center">
