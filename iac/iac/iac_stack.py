@@ -77,6 +77,7 @@ class IacStack(cdk.Stack):
             type=aws_batch.ComputeResourceType("SPOT"),
             bid_percentage = 60,
             instance_role = ecs_instance_profile.attr_arn,
+            instance_types = [aws_ec2.InstanceType("m3.medium")],
         )
         batch_compute_env = aws_batch.ComputeEnvironment(
             scope=self,

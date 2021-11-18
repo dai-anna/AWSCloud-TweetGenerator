@@ -25,8 +25,10 @@ IacStack(app, "IacStack",
 
     # Uncomment the next line if you know exactly what Account and Region you
     # want to deploy the stack to. */
-
-    env=core.Environment(account=os.getenv("ACCOUNT_NO"), region='us-east-1'),
+    env=core.Environment(
+        account=os.getenv(os.environ["CDK_DEFAULT_ACCOUNT"]),
+        region='us-east-1'
+    ),
 
     # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
     )
