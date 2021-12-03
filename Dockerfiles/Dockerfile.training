@@ -1,3 +1,4 @@
+# Built using this context: /scripts/text_generator
 FROM python:3.9-slim-buster
 
 WORKDIR /app

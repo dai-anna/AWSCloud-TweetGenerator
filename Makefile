@@ -1,3 +1,6 @@
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# Variables
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 # Define Docker contexts
 HASHTAGCOLLECTOR_CONTEXT=./scripts/scrape_hashtags
 DATACOLLECTOR_CONTEXT=./scripts/scrape_tweets
@@ -10,6 +13,9 @@ DOCKERHUB_LOCATION_DATACOLLECTOR=moritzwilksch/dukerepo:datacollector
 DOCKERHUB_LOCATION_FRONTEND=moritzwilksch/dukerepo:frontend
 
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# Normal Targets
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 install:
 	pip install --upgrade pip
 	pip install -r requirements.txt
@@ -20,8 +26,11 @@ run-frontend:
 test:
 	pytest tests/
 
-################################ DOCKER #######################################
-######## Hashtag Data Collection ########
+
+############################################### DOCKER ######################################################
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# Hashtag Data Collection
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 docker/build-hashtags: docker/clean-hashtags
 	docker build --rm -t hashtagcollector -f Dockerfiles/Dockerfile.scrapehashtags $(HASHTAGCOLLECTOR_CONTEXT)/ 
 
@@ -36,7 +45,9 @@ docker/clean-hashtags:
 	docker rm -f hashtagcollector
 
 
-######## Tweet Data Collection ########
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# Tweet Data Collection
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 docker/build:
 	docker build --rm -t datacollector -f Dockerfiles/Dockerfile.scrapetweets $(DATACOLLECTOR_CONTEXT)/ 
 
@@ -50,7 +61,9 @@ docker/run: docker/clean
 docker/clean:
 	docker rm -f datacollector
 
-######## Frontend ########
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# Frontend 
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 docker/build-frontend: docker/clean-frontend
 	docker build --rm -t frontend -f Dockerfiles/Dockerfile.frontend ./scripts/
 
@@ -65,7 +78,9 @@ docker/clean-frontend:
 	docker rm -f frontend
 
 
-####### Training ########
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# Training
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 docker/build-modeltraining: docker/clean-modeltraining
 	docker build --rm -t modeltraining -f Dockerfiles/Dockerfile.training ./scripts/text_generator
 
