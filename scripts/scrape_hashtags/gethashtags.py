@@ -27,7 +27,7 @@ s3 = boto3.resource(
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
 
 
-def get_hashtags():
+def handler(event, context):
     """Scrapes to 10 trending hashtags in the US."""
     response = requests.request("GET", url, headers=headers, data=payload)
 
@@ -59,5 +59,5 @@ def get_hashtags():
     return trends_ls
 
 if __name__ == "__main__":
-    get_hashtags()
+    handler()
 
