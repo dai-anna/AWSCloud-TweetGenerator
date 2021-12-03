@@ -8,7 +8,9 @@ from aws_cdk import (
     aws_events,
     aws_iam,
     aws_events_targets,
-    aws_stepfunctions_tasks
+    aws_stepfunctions_tasks,
+    aws_lambda,
+    aws_ecr,
 )
 import os 
 
@@ -77,14 +79,28 @@ class IacStack(cdk.Stack):
         }
         
         # create cronjob for hashtag scrape
+        # add lambda function for hashtags
+        hashtag_lambda = aws_lambda.DockerImageFunction(
+            self,
+            id = "hashtag_lambda",
+            code = aws_lambda.DockerImageCode(
+                repository = aws_ecr.Repository.from_repository_name(
+                    self, 
+                    "hashtag_repo",
+                    "dukerepo",
+                )
+            )
+        )
+        
         cronhash = aws_events.Rule(
             self,
             id="cronjob_hashtag",
             schedule = schedulers["hashtagtime"],
-            targets = "ADDTARGETHERE!!!"
+            targets = aws_events_targets.LambdaFunction(
+                handler = hashtag_lambda,
+            )
         )
         
-        # add lambda function for hashtags
         batch_compute_resources = aws_batch.ComputeResources(
             vpc = i_vpc,
             desiredv_cpus = 1,
