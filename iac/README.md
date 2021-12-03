@@ -8,6 +8,7 @@ $ cd PATH/TO?AWSCloud-TweetGenerator/iac
 $ cdk init app --language python
 $ source .venv/bin/activate
 $ python -m pip install -r requirements.txt
+echo "CDK_DEFAULT_ACCOUNT=ACCOUNT-NUMBER" >> .venv/bin/activate 
 $ cdk bootstrap aws://ACCOUNT-NUMBER/REGION
 $ cdk synth
 $ cdk deploy
