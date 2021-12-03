@@ -8,6 +8,7 @@ from aws_cdk import (
     aws_events,
     aws_iam,
     aws_events_targets,
+    aws_stepfunctions_tasks
 )
 import os 
 
@@ -68,6 +69,21 @@ class IacStack(cdk.Stack):
             vpc = i_vpc,
             #allow_all_outbound = True,
         ) 
+        
+        # move schedulers to before lambda and change to dict
+        schedulers = {
+            "hashtagtime":aws_events.Schedule.cron(hour="1", minute="31"),
+            "tweettime":aws_events.Schedule.cron(hour="3", minute="50"),
+        }
+        
+        # create cronjob for hashtag scrape
+        cronhash = aws_events.Rule(
+            self,
+            id="cronjob_hashtag",
+            schedule = schedulers["hashtagtime"],
+            targets = "ADDTARGETHERE!!!"
+        )
+        
         # add lambda function for hashtags
         batch_compute_resources = aws_batch.ComputeResources(
             vpc = i_vpc,
@@ -99,7 +115,8 @@ class IacStack(cdk.Stack):
             "batch-queue",
             compute_environments = [q_batch_compute_env],
         )
-        container_images = ["moritzwilksch/dukerepo:hashtagcollector" ,"moritzwilksch/dukerepo:datacollector"]
+        #updating below
+        container_images = ["moritzwilksch/dukerepo:datacollector", "moritzwilksch/dukerepo:modeltrain"]
         batch_job_containers = [
             aws_batch.JobDefinitionContainer(
                 image = aws_ecs.RepositoryImage(image_name = ci),
@@ -114,28 +131,30 @@ class IacStack(cdk.Stack):
                 container = bjc,
             ) for i,bjc in enumerate(batch_job_containers)
         ]
-        
-        schedulers = [
-            aws_events.Schedule.cron(hour="1", minute="31"),
-            aws_events.Schedule.cron(hour="3", minute="50"),
-        ]
         targets = [
             aws_events_targets.BatchJob(
                 job_queue_arn = batch_queue.job_queue_arn,
                 job_queue_scope = q_batch_compute_env.compute_environment,
                 job_definition_arn = bjd.job_definition_arn,
                 job_definition_scope = q_batch_compute_env.compute_environment,
+                size = 2,
                 attempts = 2,
             ) for bjd in batch_job_definitions
         ]
-        cronjobs = [
-            aws_events.Rule(
-                self,
-                id="cronjob"+str(i+1),
-                schedule=schedulers[i],
-                targets=[targets[i]]
-            ) for i in [0,1]
-        ]
+        
+        # step functions
+        step_dependencies = aws_stepfunctions_tasks.BatchJobDependency(
+            job_id="", 
+            type=None)
+        
+        # tweet scrape cronjob
+        crontweet = aws_events.Rule(
+            self,
+            id="cronjob_tweet",
+            schedule=schedulers["tweettime"],
+            targets=[targets[0]]
+        )
+        
         bucket.grant_read_write(# I don't know if this contributes anything
             identity= iamrole,
         )

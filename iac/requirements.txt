@@ -1,2 +1,11 @@
-aws-cdk.core>=1.132.0
-aws-cdk.assertions>=1.132.0
+aws-cdk.core==1.132.0
+aws-cdk.assertions==1.132.0
+aws-cdk.aws_batch==1.132.0
+aws-cdk.aws_ec2==1.132.0
+aws-cdk.aws_ecs==1.132.0
+aws-cdk.aws_s3==1.132.0
+aws-cdk.aws_events==1.132.0
+aws-cdk.aws_iam==1.132.0
+aws-cdk.aws_events_targets==1.132.0
+aws-cdk.aws_lambda==1.132.0
+aws-cdk.aws_stepfunctions_tasks==1.132.0
