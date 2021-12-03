@@ -8,6 +8,10 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 - Scrapes tweets associated to the hashtags
 - Uses generative text model to fabricate artificial tweets about trending topics
 
+## See it in Action
+- Check out the interactive generator website: XXXTBDXXX
+- Follow our Bot on Twitter [here](https://twitter.com/NGtweetsdaily)
+
 ## Project Architecture
 ![Architectural_diagram](https://user-images.githubusercontent.com/89488845/142493175-65211b07-92be-4419-84ff-48a256f151e9.png)
 
