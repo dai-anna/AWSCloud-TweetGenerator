@@ -67,7 +67,8 @@ class IacStack(cdk.Stack):
             id = "allsgid",
             vpc = i_vpc,
             #allow_all_outbound = True,
-        )
+        ) 
+        # add lambda function for hashtags
         batch_compute_resources = aws_batch.ComputeResources(
             vpc = i_vpc,
             desiredv_cpus = 1,
