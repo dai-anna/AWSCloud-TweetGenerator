@@ -8,6 +8,7 @@ from aws_cdk import (
     aws_events,
     aws_iam,
     aws_events_targets,
+    aws_stepfunctions,
     aws_stepfunctions_tasks,
     aws_lambda,
     aws_ecr,
@@ -41,6 +42,17 @@ class IacStack(cdk.Stack):
                 aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
             ]
         )
+        
+        # iamrole_sfn =aws_iam.Role(
+        #     self,
+        #     id = "iacsfn_iamrole",
+        #     assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"),
+        #     managed_policies = [
+        #         aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2ContainerServiceforEC2Role"),
+        #         aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
+        #     ]
+        # )
+        
         ecs_instance_profile = aws_iam.CfnInstanceProfile(
             self,
             id = "ecsInstanceProfile",
@@ -48,7 +60,7 @@ class IacStack(cdk.Stack):
                 iamrole_ecs.role_name
             ]
         )
-        vpc = aws_ec2.Vpc(#Only one public subnet, in only one avaiability zone, in one region. 
+        vpc = aws_ec2.Vpc(#Only one public subnet, in only one availability zone, in one region. 
             self,
             id = "mainvpc",
             max_azs = 1,
@@ -149,29 +161,44 @@ class IacStack(cdk.Stack):
                 container = bjc,
             ) for i,bjc in enumerate(batch_job_containers)
         ]
-        targets = [
-            aws_events_targets.BatchJob(
-                job_queue_arn = batch_queue.job_queue_arn,
-                job_queue_scope = q_batch_compute_env.compute_environment,
-                job_definition_arn = bjd.job_definition_arn,
-                job_definition_scope = q_batch_compute_env.compute_environment,
-                size = 2,
-                attempts = 2,
-            ) for bjd in batch_job_definitions
-        ]
         
-        # step functions
-        step_dependencies = aws_stepfunctions_tasks.BatchJobDependency(
-            job_id="", 
-            type=None)
+        # tweet_target = aws_events_targets.BatchJob(
+        #     job_queue_arn = batch_queue.job_queue_arn,
+        #     job_queue_scope = q_batch_compute_env.compute_environment,
+        #     job_definition_arn = batch_job_definitions[0].job_definition_arn,
+        #     job_definition_scope = q_batch_compute_env.compute_environment,
+        #     attempts = 2,
+        #     )
+            
         
-        # tweet scrape cronjob
+        # # step functions
+        # step_dependencies = aws_stepfunctions_tasks.BatchJobDependency(
+        #     job_id="", 
+        #     type=None)
+            
+        # tweet scrape and training cronjob
         crontweet = aws_events.Rule(
             self,
             id="cronjob_tweet",
             schedule=schedulers["tweettime"],
-            targets=[targets[0]]
         )
+        
+        datacollection_job = aws_stepfunctions_tasks.BatchSubmitJob(
+            )
+        
+        modeltrain_job = aws_stepfunctions_tasks.BatchSubmitJob(
+            )
+        
+        definition = datacollection_job.next(modeltrain_job)
+        
+        state_machine = aws_stepfunctions.StateMachine(
+            self, 
+            "state_machine",
+            definition=definition,
+            # role=iamrole_sfn
+        )
+        
+        crontweet.add_target(aws_events_targets.SfnStateMachine(state_machine))
         
         bucket.grant_read_write(# I don't know if this contributes anything
             identity= iamrole,
