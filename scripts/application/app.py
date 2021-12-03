@@ -86,6 +86,7 @@ def get_inferred_tweet(selected_hashtag: str = None):
 
 
 def get_models_for_hashtags(hashtags: list[str], most_current_date: str):
+    """ Gets models for all hashtags for date. returns dict of (hashtag: model) mappings"""
     num_regex = re.compile(r"\/model_(?P<num>\d+).joblib")
     model_names = [obj.key for obj in bucket.objects.filter(Prefix=f"{most_current_date}/") if "model_" in obj.key]
     # print(f"Found the following models: {model_names}")
@@ -118,6 +119,7 @@ def get_models_for_hashtags(hashtags: list[str], most_current_date: str):
 ########### INIT Environmet ##############
 # HASHTAGS = ["a", "b", "c"]
 most_current_date = get_most_current_date_in_s3()
+# most_current_date = "2021-11-17"  # hardcode for experimenting
 print(f"{most_current_date = }")
 hashtags = get_available_hashtags(most_current_date)
 corpora, _ = get_corpora_for_hashtags(hashtags, most_current_date)  # we dont use the corpus numbers here
@@ -154,3 +156,27 @@ async def main_page(request: Request):
     }
 
     return templates.TemplateResponse("index.html", params)
+
+@app.get("/pull_new_model")
+async def pull_new_model(request: Request):
+    # these need to be global to overwrite the preexisting values ones
+    global most_current_date
+    global models 
+    global hashtags 
+    global corpora 
+    global tweet_seeds 
+    
+    most_current_date = get_most_current_date_in_s3()
+    print(f"{most_current_date = }")
+
+    hashtags = get_available_hashtags(most_current_date)
+    corpora, _ = get_corpora_for_hashtags(hashtags, most_current_date)  # we dont use the corpus numbers here
+    tweet_seeds = get_all_tweet_seeds(hashtags)
+    models = get_models_for_hashtags(hashtags, most_current_date)
+
+    return {
+        "message": "New models pulled.",
+        "using_date": str(most_current_date)
+    }
+
+    
