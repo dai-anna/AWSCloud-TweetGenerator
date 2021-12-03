@@ -11,6 +11,7 @@ TRAIN_CONTEXT=./scripts/text_generator
 DOCKERHUB_LOCATION_HASHTAGCOLLECTOR=moritzwilksch/dukerepo:hashtagcollector
 DOCKERHUB_LOCATION_DATACOLLECTOR=moritzwilksch/dukerepo:datacollector
 DOCKERHUB_LOCATION_FRONTEND=moritzwilksch/dukerepo:frontend
+DOCKERHUB_LOCATION_MODELTRAIN=moritzwilksch/dukerepo:modeltrain
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ docker/build:
 	docker build --rm -t datacollector -f Dockerfiles/Dockerfile.scrapetweets $(DATACOLLECTOR_CONTEXT)/ 
 
 docker/build-push:
-	docker build --rm -t $(DOCKERHUB_LOCATION_DATACOLLECTOR) -f Dockerfiles/Dockerfile.scrapetweets $(DATACOLLECTOR_CONTEXT)/ --no-cache
+	docker build --rm -t $(DOCKERHUB_LOCATION_DATACOLLECTOR) -f Dockerfiles/Dockerfile.scrapetweets $(DATACOLLECTOR_CONTEXT)/
 	docker push $(DOCKERHUB_LOCATION_DATACOLLECTOR)
 
 docker/run: docker/clean
@@ -89,3 +90,7 @@ docker/run-modeltraining: docker/clean-modeltraining
 
 docker/clean-modeltraining:
 	docker rm -f modeltraining
+
+docker/build-push-modeltrain:
+	docker build --rm -t $(DOCKERHUB_LOCATION_MODELTRAIN) -f Dockerfiles/Dockerfile.frontend ./scripts/
+	docker push $(DOCKERHUB_LOCATION_MODELTRAIN)
