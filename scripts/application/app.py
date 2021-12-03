@@ -49,7 +49,7 @@ def get_all_tweet_seeds(hashtags: list[str]):
     tweet_seeds = dict()
 
     for hashtag in hashtags:
-        sep_tweets: list[str] = " ".join(corpora.get(hashtag, "There is no data. There is no data.".split(". "))).split(". ")
+        sep_tweets: list[str] = " ".join(corpora.get(hashtag, "There is no data. There is no data.".split("c"))).split(". ")
         tweet_seeds[hashtag] = [
             " ".join(tweet.split()[:4]) for tweet in sep_tweets if len(tweet.split()) > 6
         ]

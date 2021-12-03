@@ -1,11 +1,9 @@
 #%%
 import nltk
 from typing import Dict, List
-import numpy as np
 import boto3
 import os
 import joblib
-import tempfile
 import re
 import io
 
