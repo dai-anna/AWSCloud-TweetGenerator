@@ -1,0 +1,15 @@
+# Built using this context: /scripts/text_generator
+FROM python:3.9-slim-buster
+
+WORKDIR /app
+
+COPY requirements_train.txt /app/requirements_train.txt
+RUN pip install --no-cache-dir -r /app/requirements_train.txt
+
+
+RUN python -m nltk.downloader punkt
+    # && python -m nltk.downloader punkt
+
+COPY train.py /app/train.py
+
+ENTRYPOINT python /app/train.py

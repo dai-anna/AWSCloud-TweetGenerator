@@ -1,11 +1,9 @@
 #%%
 import nltk
 from typing import Dict, List
-import numpy as np
 import boto3
 import os
 import joblib
-import tempfile
 import re
 import io
 
@@ -113,11 +111,11 @@ def get_available_hashtags(date_aka_folder: str):
     return hashtags
 
 
-def get_corpora_for_hashtags(hashtags: list[str]):
+def get_corpora_for_hashtags(hashtags: list[str], most_current_date: str):
     """Returns all available corpora in `bucket/most_current_date`"""
 
     num_regex = re.compile(r"\/clean_out_(?P<num>\d+).txt")
-    corpora_names = [obj.key for obj in bucket.objects.all() if "clean_out_" in obj.key]
+    corpora_names = [obj.key for obj in bucket.objects.filter(Prefix=f"{most_current_date}/") if "clean_out_" in obj.key]
     print(f"Found the following corpora: {corpora_names}")
 
     corpora = dict()
@@ -152,7 +150,7 @@ if __name__ == "__main__":
 
     corpora: dict = None
     corpora_numbers: list[int] = None
-    corpora, corpora_numbers = get_corpora_for_hashtags(hashtags)
+    corpora, corpora_numbers = get_corpora_for_hashtags(hashtags, most_current_date)
 
     for corpus, idx in zip(corpora, corpora_numbers):
         print(f"[INFO] Training corpus number {idx}")

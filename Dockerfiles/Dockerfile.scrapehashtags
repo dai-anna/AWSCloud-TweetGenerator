@@ -1,3 +1,4 @@
+# Built using this context: /scripts/scrape_hashtags
 FROM python:3.9-slim-buster
 
 WORKDIR /app
