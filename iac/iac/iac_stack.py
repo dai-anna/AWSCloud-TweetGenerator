@@ -90,12 +90,12 @@ class IacStack(cdk.Stack):
             "tweettime":aws_events.Schedule.cron(hour="3", minute="50"),
         }
         
-        # create cronjob for hashtag scrape
-        # add lambda function for hashtags
+        create cronjob for hashtag scrape
+        add lambda function for hashtags
         hashtag_lambda = aws_lambda.DockerImageFunction(
             self,
             id = "hashtag_lambda",
-            code = aws_lambda.DockerImageCode(
+            code = aws_lambda.DockerImageCode.from_ecr(
                 repository = aws_ecr.Repository.from_repository_name(
                     self, 
                     "hashtag_repo",
@@ -108,9 +108,11 @@ class IacStack(cdk.Stack):
             self,
             id="cronjob_hashtag",
             schedule = schedulers["hashtagtime"],
-            targets = aws_events_targets.LambdaFunction(
-                handler = hashtag_lambda,
-            )
+            targets = [
+                aws_events_targets.LambdaFunction(
+                    handler = hashtag_lambda,
+                )
+            ]
         )
         
         batch_compute_resources = aws_batch.ComputeResources(
