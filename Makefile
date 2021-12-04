@@ -69,7 +69,7 @@ docker/build-frontend: docker/clean-frontend
 	docker build --rm -t frontend -f Dockerfiles/Dockerfile.frontend ./scripts/
 
 docker/build-push-frontend:
-	docker build --rm -t $(DOCKERHUB_LOCATION_FRONTEND) -f Dockerfiles/Dockerfile.frontend ./scripts/ --no-cache
+	docker build --rm -t $(DOCKERHUB_LOCATION_FRONTEND) -f Dockerfiles/Dockerfile.frontend ./scripts/
 	docker push $(DOCKERHUB_LOCATION_FRONTEND)
 
 docker/run-frontend: docker/clean-frontend
