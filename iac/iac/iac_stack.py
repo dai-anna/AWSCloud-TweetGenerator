@@ -90,8 +90,8 @@ class IacStack(cdk.Stack):
             "tweettime":aws_events.Schedule.cron(hour="3", minute="50"),
         }
         
-        create cronjob for hashtag scrape
-        add lambda function for hashtags
+        # create cronjob for hashtag scrape
+        # add lambda function for hashtags
         hashtag_lambda = aws_lambda.DockerImageFunction(
             self,
             id = "hashtag_lambda",
