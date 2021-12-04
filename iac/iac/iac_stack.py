@@ -169,9 +169,8 @@ class IacStack(cdk.Stack):
         #     )
             
         
-        # # step functions
-        # step_dependencies = aws_stepfunctions_tasks.BatchJobDependency(
-        #     job_id="", 
+        # dependencies = aws_stepfunctions_tasks.BatchJobDependency(
+        #     job_id=dc_job."AWS_BATCH_JOB_ID", 
         #     type=None)
             
         # tweet scrape and training cronjob
@@ -182,12 +181,28 @@ class IacStack(cdk.Stack):
         )
         
         datacollection_job = aws_stepfunctions_tasks.BatchSubmitJob(
+            self,
+            id="datacollection_job",
+            job_definition_arn = batch_job_definitions[0].job_definition_arn,
+            job_name = "dc_job",
+            job_queue_arn = batch_queue.job_queue_arn,
+            attempts = 2
             )
         
         modeltrain_job = aws_stepfunctions_tasks.BatchSubmitJob(
+            self,
+            id="modeltrain_job",
+            job_definition_arn = batch_job_definitions[1].job_definition_arn,
+            job_name = "mt_job",
+            job_queue_arn = batch_queue.job_queue_arn,
+            attempts = 2
             )
         
-        definition = datacollection_job.next(modeltrain_job)
+    
+        definition = datacollection_job\
+            .next(aws_stepfunctions.Choice(self, "choice")
+                .when(aws_stepfunctions.Condition.string_equals("$.status", "SUCCESS"), modeltrain_job)
+            )
         
         state_machine = aws_stepfunctions.StateMachine(
             self, 
