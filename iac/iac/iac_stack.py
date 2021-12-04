@@ -130,7 +130,7 @@ class IacStack(cdk.Stack):
             scope=self,
             id='batch-compute-env',
             compute_resources=batch_compute_resources,
-            service_role = iamrole, # added iamrole back
+            service_role = iamrole, # added iamrole
         )
         q_batch_compute_env = aws_batch.JobQueueComputeEnvironment(
             compute_environment = aws_batch.ComputeEnvironment.from_compute_environment_arn(
