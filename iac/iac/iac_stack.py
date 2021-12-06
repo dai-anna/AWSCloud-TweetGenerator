@@ -115,31 +115,40 @@ class IacStack(cdk.Stack):
             ]
         )
         
-        batch_compute_resources = aws_batch.ComputeResources(
-            vpc = i_vpc,
-            desiredv_cpus = 1,
-            maxv_cpus = 2,
-            minv_cpus = 0,
-            security_groups = [sg],
-            type=aws_batch.ComputeResourceType("SPOT"),
-            bid_percentage = 60,
-            instance_role = ecs_instance_profile.attr_arn,
-            instance_types = [aws_ec2.InstanceType("m3.medium")],
+        # batch_compute_resources = aws_batch.ComputeResources(
+        #     vpc = i_vpc,
+        #     desiredv_cpus = 1,
+        #     maxv_cpus = 2,
+        #     minv_cpus = 0,
+        #     security_groups = [sg],
+        #     type=aws_batch.ComputeResourceType("SPOT"),
+        #     bid_percentage = 60,
+        #     instance_role = ecs_instance_profile.attr_arn,
+        #     instance_types = [aws_ec2.InstanceType("m3.medium")],
+        # )
+        # batch_compute_env = aws_batch.ComputeEnvironment(
+        #     scope=self,
+        #     id='batch-compute-env',
+        #     compute_resources=batch_compute_resources,
+        #     # service_role = , # added iamrole
+        # )
+        
+        batch_compute_env = aws_batch.ComputeEnvironment.from_compute_environment_arn(
+            self,
+            id = "batch-compute-env",
+            compute_environment_arn="arn:aws:batch:us-east-1:533527479286:compute-environment/testing"
         )
-        batch_compute_env = aws_batch.ComputeEnvironment(
-            scope=self,
-            id='batch-compute-env',
-            compute_resources=batch_compute_resources,
-            service_role = "service-role/AWSBatchServiceRole", # added iamrole
-        )
+        
         q_batch_compute_env = aws_batch.JobQueueComputeEnvironment(
-            compute_environment = aws_batch.ComputeEnvironment.from_compute_environment_arn(
-                self,
-                id="i-compute-env",
-                compute_environment_arn = batch_compute_env.compute_environment_arn,
-            ),
+            compute_environment = batch_compute_env,
+            # compute_environment = aws_batch.ComputeEnvironment.from_compute_environment_arn(
+            #     self,
+            #     id="i-compute-env",
+            #     compute_environment_arn = batch_compute_env.compute_environment_arn,
+            # ),
             order = 1,
         )
+        
         batch_queue = aws_batch.JobQueue(
             self,
             "batch-queue",
