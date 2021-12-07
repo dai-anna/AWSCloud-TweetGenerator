@@ -100,7 +100,8 @@ class IacStack(cdk.Stack):
                     self, 
                     "hashtag_repo",
                     "dukerepo",
-                )
+                ),
+            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucket_name},
             )
         )
         
