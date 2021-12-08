@@ -56,6 +56,7 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         c.Limit = 10_000  # Limit to prevent super-long scrapes which occur for spam hashtags
 
         c.Store_csv = True
+        c.Hide_output = True
         c.Output = f"twint_out_{idx}.csv"
         logging.info(f"Starting {idx}: {trend} scrape")
         twint.run.Search(c)
