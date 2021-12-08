@@ -101,8 +101,8 @@ class IacStack(cdk.Stack):
                     "hashtag_repo",
                     "dukerepo",
                 ),
-            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucket_name},
-            )
+            ),
+            environment = {"API_TOKEN":os.getenv("API_TOKEN"), "ACCESS_KEY_ID":os.getenv("ACCESS_KEY_ID"), "SECRET_ACCESS_KEY":os.getenv("SECRET_ACCESS_KEY"), "BUCKET_NAME":bucket.bucket_name},
         )
         
         cronhash = aws_events.Rule(
@@ -162,7 +162,7 @@ class IacStack(cdk.Stack):
             aws_batch.JobDefinitionContainer(
                 image = aws_ecs.RepositoryImage(image_name = ci),
                 memory_limit_mib = 512,
-                environment = {"API_TOKEN":os.getenv("API_TOKEN"), "BUCKET_NAME":bucket.bucket_name}
+                environment = {"API_TOKEN":os.getenv("API_TOKEN"), "ACCESS_KEY_ID":os.getenv("ACCESS_KEY_ID"), "SECRET_ACCESS_KEY":os.getenv("SECRET_ACCESS_KEY"), "BUCKET_NAME":bucket.bucket_name},
             ) for ci in container_images
         ]
         batch_job_definitions = [
@@ -214,7 +214,7 @@ class IacStack(cdk.Stack):
     
         definition = datacollection_job\
             .next(aws_stepfunctions.Choice(self, "choice")
-                .when(aws_stepfunctions.Condition.string_equals("$.status", "SUCCESS"), modeltrain_job)
+                .when(aws_stepfunctions.Condition.string_equals("$.Status", "SUCCEEDED"), modeltrain_job)
             )
         
         state_machine = aws_stepfunctions.StateMachine(

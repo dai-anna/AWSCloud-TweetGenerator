@@ -50,7 +50,7 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         c.Since = (datetime.datetime.now() - datetime.timedelta(hours=10)).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
-        # DO NOT use c.Unitl. When used, returns significantly fewer tweets!!
+        # DO NOT use c.Until. When used, returns significantly fewer tweets!!
 
 
         c.Limit = 10_000  # Limit to prevent super-long scrapes which occur for spam hashtags
