@@ -127,12 +127,13 @@ class IacStack(cdk.Stack):
         #     instance_role = ecs_instance_profile.attr_arn,
         #     instance_types = [aws_ec2.InstanceType("m3.medium")],
         # )
+        
         # batch_compute_env = aws_batch.ComputeEnvironment(
         #     scope=self,
         #     id='batch-compute-env',
         #     compute_resources=batch_compute_resources,
-        #     # service_role = , # add iamrole
-        #     # instance_role = , # add instance role
+        #     service_role = , # add iamrole
+        #     ?instance_role = , # add instance role??
         # )
         
         batch_compute_env = aws_batch.ComputeEnvironment.from_compute_environment_arn(
@@ -187,6 +188,7 @@ class IacStack(cdk.Stack):
         #     type=None)
             
         # tweet scrape and training cronjob
+    
         crontweet = aws_events.Rule(
             self,
             id="cronjob_tweet",
