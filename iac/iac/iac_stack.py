@@ -24,6 +24,7 @@ class IacStack(cdk.Stack):
             self,
             id = "mainbucket",
         )
+        
         iamrole = aws_iam.Role(
             self,
             id = "iac_iamrole",
@@ -33,25 +34,43 @@ class IacStack(cdk.Stack):
                 aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
             ]
         )
+   
+        
         iamrole_ecs = aws_iam.Role(
             self,
             id = "iacecs_iamrole",
-            assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"),
+            assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"), #batch.amazonaws.com?
             managed_policies = [
                 aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2ContainerServiceforEC2Role"),
                 aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
             ]
         )
         
-        # iamrole_sfn =aws_iam.Role(
-        #     self,
-        #     id = "iacsfn_iamrole",
-        #     assumed_by = aws_iam.ServicePrincipal("ec2.amazonaws.com"),
-        #     managed_policies = [
-        #         aws_iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2ContainerServiceforEC2Role"),
-        #         aws_iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
-        #     ]
-        # )
+        ec2spot_statements = [
+            aws_iam.PolicyStatement(
+                actions = [
+                    "ec2:StartInstances", 
+                    "ec2:StopInstances", 
+                    "ec2:RunInstances", 
+                    "ec2:TerminateInstances", 
+                    "ec2:CancelSpotInstanceRequests", 
+                    "ec2:CreateSpotDatafeedSubscription", 
+                    "ec2:DeleteSpotDatafeedSubscription", 
+                    "ec2:RequestSpotInstances", 
+                    "ec2:CancelSpotFleetRequests",
+                    "ec2:ModifySpotFleetRequest",
+                    "ec2:RequestSpotFleet",
+                    ],
+            )
+        ]
+             
+        iampolicy_ec2spot = aws_iam.Policy(
+            self,
+            id = "iac_iampolicy_ec2spot",
+            policy_name = "ec2spot_full_access",
+            statements = ec2spot_statements,
+            roles = iamrole_ecs,
+        )
         
         ecs_instance_profile = aws_iam.CfnInstanceProfile(
             self,
@@ -60,6 +79,7 @@ class IacStack(cdk.Stack):
                 iamrole_ecs.role_name
             ]
         )
+
         vpc = aws_ec2.Vpc(#Only one public subnet, in only one availability zone, in one region. 
             self,
             id = "mainvpc",
@@ -116,31 +136,30 @@ class IacStack(cdk.Stack):
             ]
         )
         
-        # batch_compute_resources = aws_batch.ComputeResources(
-        #     vpc = i_vpc,
-        #     desiredv_cpus = 1,
-        #     maxv_cpus = 2,
-        #     minv_cpus = 0,
-        #     security_groups = [sg],
-        #     type=aws_batch.ComputeResourceType("SPOT"),
-        #     bid_percentage = 60,
-        #     instance_role = ecs_instance_profile.attr_arn,
-        #     instance_types = [aws_ec2.InstanceType("m3.medium")],
-        # )
-        
-        # batch_compute_env = aws_batch.ComputeEnvironment(
-        #     scope=self,
-        #     id='batch-compute-env',
-        #     compute_resources=batch_compute_resources,
-        #     service_role = , # add iamrole
-        #     ?instance_role = , # add instance role??
-        # )
-        
-        batch_compute_env = aws_batch.ComputeEnvironment.from_compute_environment_arn(
-            self,
-            id = "batch-compute-env",
-            compute_environment_arn="arn:aws:batch:us-east-1:533527479286:compute-environment/test2"
+        batch_compute_resources = aws_batch.ComputeResources(
+            vpc = i_vpc,
+            desiredv_cpus = 1,
+            maxv_cpus = 2,
+            minv_cpus = 0,
+            security_groups = [sg],
+            bid_percentage = 60,
+            type = aws_batch.ComputeResourceType.SPOT,
+            instance_role = iamrole_ecs.role_arn, 
+            # instance_role = ecs_instance_profile.attr_arn,
+            instance_types = [aws_ec2.InstanceType("m3.medium")],
         )
+        
+        batch_compute_env = aws_batch.ComputeEnvironment(
+            scope=self,
+            id='batch-compute-env',
+            compute_resources=batch_compute_resources,
+        )
+        
+        # batch_compute_env = aws_batch.ComputeEnvironment.from_compute_environment_arn(
+        #     self,
+        #     id = "batch-compute-env",
+        #     compute_environment_arn="arn:aws:batch:us-east-1:533527479286:compute-environment/test2"
+        # )
         
         q_batch_compute_env = aws_batch.JobQueueComputeEnvironment(
             compute_environment = batch_compute_env,
