@@ -73,7 +73,7 @@ docker/build-push-frontend:
 	docker push $(DOCKERHUB_LOCATION_FRONTEND)
 
 docker/run-frontend: docker/clean-frontend
-	docker run -d --name frontend --env-file Dockerfiles/env.list -p 8080:8080 frontend
+	docker run -it --name frontend --env-file Dockerfiles/env.list -p 8080:8080 frontend
 
 docker/clean-frontend:
 	docker rm -f frontend
