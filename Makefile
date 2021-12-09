@@ -92,5 +92,5 @@ docker/clean-modeltraining:
 	docker rm -f modeltraining
 
 docker/build-push-modeltrain:
-	docker build --rm -t $(DOCKERHUB_LOCATION_MODELTRAIN) -f Dockerfiles/Dockerfile.frontend ./scripts/
+	docker build --rm -t $(DOCKERHUB_LOCATION_MODELTRAIN) -f Dockerfiles/Dockerfile.training ./scripts/text_generator
 	docker push $(DOCKERHUB_LOCATION_MODELTRAIN)
