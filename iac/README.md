@@ -3,7 +3,7 @@
 
 Commands to spin up the infrastructure in your AWS Account:  
 
-```console
+```bash
 $ cd PATH/TO?AWSCloud-TweetGenerator/iac
 $ cdk init app --language python
 $ source .venv/bin/activate
