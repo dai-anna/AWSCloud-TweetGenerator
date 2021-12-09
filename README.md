@@ -15,7 +15,7 @@ AWS cloud native Tweet generator leveraging NLP text generation models to genera
 - Follow our Bot on Twitter [here](https://twitter.com/NGtweetsdaily) 🐦
 
 ## 📊 Project Architecture
-![Architectural_diagram](https://user-images.githubusercontent.com/89488845/142493175-65211b07-92be-4419-84ff-48a256f151e9.png)
+<img width="1295" alt="image" src="https://user-images.githubusercontent.com/89488845/145492148-059a0332-116a-4c53-a447-c667aaa8580f.png">
 
 ## 💻 Frontend
 <div align="center">
