@@ -6,7 +6,7 @@ import os
 import joblib
 import re
 import io
-
+import requests
 
 ROOT_DIR = "./"
 DATE_REGEX = re.compile(r"\d\d\d\d-\d\d-\d\d")
@@ -20,6 +20,7 @@ s3 = boto3.resource(
 )
 
 bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
+frontend_url = os.getenv("FRONTEND_URL")
 
 # with tempfile.TemporaryFile() as f:
 #     bucket.download_fileobj("2021-11-15/clean_out_0.txt", f)
@@ -100,7 +101,9 @@ def train(
 
 def get_most_current_date_in_s3():
     """Returns the most current folder name in `bucket`"""
-    return max([obj.key for obj in bucket.objects.all() if DATE_REGEX.match(obj.key)]).split("/")[0]
+    return max(
+        [obj.key for obj in bucket.objects.all() if DATE_REGEX.match(obj.key)]
+    ).split("/")[0]
 
 
 def get_available_hashtags(date_aka_folder: str):
@@ -115,7 +118,11 @@ def get_corpora_for_hashtags(hashtags: list[str], most_current_date: str):
     """Returns all available corpora in `bucket/most_current_date`"""
 
     num_regex = re.compile(r"\/clean_out_(?P<num>\d+).txt")
-    corpora_names = [obj.key for obj in bucket.objects.filter(Prefix=f"{most_current_date}/") if "clean_out_" in obj.key]
+    corpora_names = [
+        obj.key
+        for obj in bucket.objects.filter(Prefix=f"{most_current_date}/")
+        if "clean_out_" in obj.key
+    ]
     print(f"Found the following corpora: {corpora_names}")
 
     corpora = dict()
@@ -140,7 +147,10 @@ def get_corpora_for_hashtags(hashtags: list[str], most_current_date: str):
             ).split()
 
     # print(corpora)
-    return corpora, corpora_numbers  # every corpus in corpora is A SINGLE string containing tweets separated by .
+    return (
+        corpora,
+        corpora_numbers,
+    )  # every corpus in corpora is A SINGLE string containing tweets separated by .
 
 
 if __name__ == "__main__":
@@ -156,3 +166,11 @@ if __name__ == "__main__":
         print(f"[INFO] Training corpus number {idx}")
         corpus = nltk.word_tokenize(corpus.lower())
         train(3, corpus, most_current_date=most_current_date, model_id=idx)
+
+    # ping pull_new_model
+    _ = requests.get(f"{frontend_url}/pull_new_model", timeout=60)
+    print("[INFO] Pinged pull new model.")
+
+    # ping post_tweet
+    _ = requests.get(f"{frontend_url}/secret_endpoint_to_post_tweet", timeout=60)
+    print("[INFO] Pinged post_tweet.")
