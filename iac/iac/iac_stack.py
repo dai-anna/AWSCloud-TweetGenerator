@@ -95,14 +95,15 @@ class IacStack(cdk.Stack):
             ]
         )
         
+        # availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"]
         i_vpc = aws_ec2.Vpc.from_vpc_attributes(
             self, #this was created to be passed into sg and batch_compute_resource. may have been unnecessary and just the vpc may have sufficed
             "main-ipvc", 
-            availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"],
+            availability_zones = ["*"],
             # availability_zones = [i.availability_zone for i in vpc.public_subnets], 
             vpc_id = vpc.vpc_id,
-            public_subnet_ids = ["10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
-            # public_subnet_ids = [i.subnet_id for i in vpc.public_subnets],
+            # public_subnet_ids = ["10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
+            public_subnet_ids = [i.subnet_id for i in vpc.public_subnets],
         )
         
         sg = aws_ec2.SecurityGroup(
@@ -162,7 +163,6 @@ class IacStack(cdk.Stack):
             id ='batch-compute-env',
             compute_resources=batch_compute_resources,
             service_role = iamrole,
-            enabled = True,
             managed = True,
             compute_environment_name = "DataCollection_ModelTrain"
         )
