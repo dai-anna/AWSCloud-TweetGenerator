@@ -2,20 +2,22 @@
 # AWS Cloud Tweet Generator <img width=90 align="right" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Duke_University_logo.svg/1024px-Duke_University_logo.svg.png">
 Lives on  <img width=100 src="https://www.icmanage.com/wp-content/uploads/2018/05/AWS-logo.png">
 
-## The Project
+## 🥇 The Project
 AWS cloud native Tweet generator leveraging NLP text generation models to generate Tweets based off trending hashtags in the past 24 hours.
 - Ingests currently trending hashtags
 - Scrapes tweets associated to the hashtags
 - Uses generative text model to fabricate artificial tweets about trending topics
+- Provides frontend to use generator
+- Posts a generated Tweet to Twitter once a day
 
-## See it in Action
-- Check out the interactive generator website: XXXTBDXXX
-- Follow our Bot on Twitter [here](https://twitter.com/NGtweetsdaily)
+## ⚙️ See it in Action
+- Check out the interactive frontend to use the generator: https://tweetbot-frontend-q27ovwhhdq-uc.a.run.app
+- Follow our Bot on Twitter [here](https://twitter.com/NGtweetsdaily) 🐦
 
-## Project Architecture
-![Architectural_diagram](https://user-images.githubusercontent.com/89488845/142493175-65211b07-92be-4419-84ff-48a256f151e9.png)
+## 📊 Project Architecture
+<img width="1295" alt="image" src="https://user-images.githubusercontent.com/89488845/145492148-059a0332-116a-4c53-a447-c667aaa8580f.png">
 
-## Frontend
+## 💻 Frontend
 <div align="center">
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/58488209/142140632-2ed40fef-075a-4639-8d60-aebdc615c046.png">
 </div>
