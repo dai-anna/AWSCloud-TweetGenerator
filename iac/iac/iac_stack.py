@@ -89,16 +89,16 @@ class IacStack(cdk.Stack):
             self, id="ecsInstanceProfile", roles=[iamrole_ecs.role_name]
         )
 
-        vpc = aws_ec2.Vpc(  # Only one public subnet, in only one availability zone, in one region.
-            self,
-            id="mainvpc",
-            max_azs=1,
-            subnet_configuration=[
-                aws_ec2.SubnetConfiguration(
-                    name="public_subnet1", subnet_type=aws_ec2.SubnetType("PUBLIC")
-                )
-            ],
-        )
+        # vpc = aws_ec2.Vpc(  # Only one public subnet, in only one availability zone, in one region.
+        #     self,
+        #     id="mainvpc",
+        #     max_azs=1,
+        #     subnet_configuration=[
+        #         aws_ec2.SubnetConfiguration(
+        #             name="public_subnet1", subnet_type=aws_ec2.SubnetType("PUBLIC")
+        #         )
+        #     ],
+        # )
 
         # availability_zones = ["us-east-1b", "us-east-1c", "us-east-1d", "us-east-1e"]
         i_vpc = aws_ec2.Vpc.from_vpc_attributes(
@@ -106,9 +106,9 @@ class IacStack(cdk.Stack):
             "main-ipvc",
             availability_zones=["*"],
             # availability_zones = [i.availability_zone for i in vpc.public_subnets],
-            vpc_id=vpc.vpc_id,
-            # public_subnet_ids = ["10.0.2.0/24", "10.0.3.0/24", "10.0.4.0/24", "10.0.5.0/24"]
-            public_subnet_ids=[i.subnet_id for i in vpc.public_subnets],
+            vpc_id="vpc-063358bf08a40ecde",
+            public_subnet_ids = ["subnet-04cfd2562ad030a43"]
+            # public_subnet_ids=[i.subnet_id for i in vpc.public_subnets],
         )
 
         sg = aws_ec2.SecurityGroup(
