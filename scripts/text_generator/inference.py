@@ -1,37 +1,15 @@
 # %%
-import nltk
 from typing import Dict, List
 import numpy as np
-import boto3
-import os
-import joblib
+
 
 try:
     from train import build_proba_dict, get_pdist_from_proba_dict
 except ModuleNotFoundError:
     from scripts.text_generator.train import build_proba_dict, get_pdist_from_proba_dict
 
-import tempfile
 
 ROOT_DIR = "./"
-
-s3 = boto3.resource(
-    service_name="s3",
-    region_name="us-east-1",
-    aws_access_key_id=os.getenv("ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("SECRET_ACCESS_KEY"),
-)
-
-bucket = s3.Bucket(os.getenv("BUCKET_NAME"))
-# bucket.download_file("text-generator/proba_dict.joblib", f"{ROOT_DIR}artifacts/proba_dict.joblib")
-
-with tempfile.TemporaryFile() as f:
-    bucket.download_fileobj("text-generator/proba_dict.joblib", f)
-    f.seek(0)
-    proba_dict = joblib.load(f)
-
-print("[INFO] Model downloaded from S3.")
-# proba_dict = joblib.load(f"{ROOT_DIR}artifacts/proba_dict.joblib")
 
 
 def finish_sentence(
@@ -70,16 +48,3 @@ def finish_sentence(
     return response
 
 
-# %%
-
-# Backoff test
-
-if __name__ == "__main__":
-    corpus = nltk.corpus.gutenberg.raw("austen-sense.txt")
-    corpus = nltk.word_tokenize(corpus.lower())
-    print(corpus)
-    print(
-        finish_sentence(
-            "when she saw".split(), n=3, corpus=corpus, max_len=25, proba_dict=proba_dict
-        )
-    )
