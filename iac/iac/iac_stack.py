@@ -274,7 +274,6 @@ class IacStack(cdk.Stack):
             self,
             "state_machine",
             definition=definition,
-            # role=iamrole_sfn
         )
 
         crontweet.add_target(aws_events_targets.SfnStateMachine(state_machine))
