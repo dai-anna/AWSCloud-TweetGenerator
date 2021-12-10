@@ -72,6 +72,11 @@ docker/build-push-frontend:
 	docker build --rm -t $(DOCKERHUB_LOCATION_FRONTEND) -f Dockerfiles/Dockerfile.frontend ./scripts/
 	docker push $(DOCKERHUB_LOCATION_FRONTEND)
 
+docker/build-push-gcloud-frontend: docker/build-frontend
+	docker tag frontend us-east1-docker.pkg.dev/ids706-tweetbot/dukerepo/frontend
+	docker push us-east1-docker.pkg.dev/ids706-tweetbot/dukerepo/frontend
+
+
 docker/run-frontend: docker/clean-frontend
 	docker run -it --name frontend --env-file Dockerfiles/env.list -p 8080:8080 frontend
 
