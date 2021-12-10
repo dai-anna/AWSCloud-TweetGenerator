@@ -110,6 +110,15 @@ class IacStack(cdk.Stack):
             public_subnet_ids = ["subnet-04cfd2562ad030a43"]
             # public_subnet_ids=[i.subnet_id for i in vpc.public_subnets],
         )
+        i_vpc_default = aws_ec2.Vpc.from_lookup(
+            self,
+            "default-vpc",
+            is_default = True,
+        )
+        default_subnet_3 = i_vpc_default.select_subnets(
+            availability_zones = ["us-east-1e"],
+            subnet_type = aws_ec2.SubnetType("PUBLIC"),
+        )
 
         sg = aws_ec2.SecurityGroup(
             self,
@@ -157,6 +166,7 @@ class IacStack(cdk.Stack):
 
         batch_compute_resources = aws_batch.ComputeResources(
             vpc=i_vpc,
+            #vpc_subnets = default_subnet_3,
             desiredv_cpus=1,
             maxv_cpus=2,
             minv_cpus=0,
