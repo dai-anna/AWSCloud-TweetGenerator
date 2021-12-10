@@ -212,6 +212,7 @@ class IacStack(cdk.Stack):
                     "ACCESS_KEY_ID": os.getenv("ACCESS_KEY_ID"),
                     "SECRET_ACCESS_KEY": os.getenv("SECRET_ACCESS_KEY"),
                     "BUCKET_NAME": bucket.bucket_name,
+                    "FRONTEND_URL": os.getenv("FRONTEND_URL"),
                 },
             )
             for ci in container_images
