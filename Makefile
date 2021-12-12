@@ -80,7 +80,6 @@ docker/build-push-gcloud-frontend: docker/build-frontend  # Production target
 	docker tag frontend us-east1-docker.pkg.dev/ids706-tweetbot/dukerepo/frontend
 	docker push us-east1-docker.pkg.dev/ids706-tweetbot/dukerepo/frontend
 
-
 docker/run-frontend: docker/clean-frontend
 	docker run -it --name frontend --env-file Dockerfiles/env.list -p 8080:8080 frontend
 
