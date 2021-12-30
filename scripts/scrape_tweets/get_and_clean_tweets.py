@@ -1,4 +1,4 @@
-import twint
+import snscrape
 import datetime
 import os
 import boto3
@@ -6,11 +6,15 @@ import pandas as pd
 import re
 import tempfile
 import logging
+import json
 
 logging.basicConfig(
     format="[%(levelname)s] %(asctime)s - %(message)s",
     level=logging.INFO,
-    handlers=[logging.StreamHandler(), logging.FileHandler("log_get_and_clean_tweets.log")],
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("log_get_and_clean_tweets.log"),
+    ],
 )
 
 today = datetime.date.today()
@@ -43,25 +47,16 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         trends_ls = [line.rstrip() for line in trends_ls]
 
     for idx, trend in enumerate(trends_ls):
-        trend = trend.strip("#")
-        c = twint.Config()
-        c.Search = "#" + trend.strip("#").replace(" ", "")  # your search here
-        c.Lang = "en"
-        c.Since = (datetime.datetime.now() - datetime.timedelta(hours=24)).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        # DO NOT use c.Until. When used, returns significantly fewer tweets!!
-
-
-        c.Limit = 10_000  # Limit to prevent super-long scrapes which occur for spam hashtags
-
-        c.Store_csv = True
-        c.Hide_output = True
-        c.Output = f"twint_out_{idx}.csv"
+        trend = trend.strip("#").replace(" ", "")
         logging.info(f"Starting {idx}: {trend} scrape")
-        twint.run.Search(c)
-        logging.info(f"Finished {idx}: {trend} scrape")
 
+        # snscrape needs to be executed as a CLI
+        os.system(
+            f'snscrape -n 1000 --jsonl twitter-hashtag "{trend} lang:en" > snscrape_out_{idx}.jsonl'  # these are JSON **lines**
+        )
+
+
+        logging.info(f"Finished {idx}: {trend} scrape")
 
 
 ###############################################
@@ -69,16 +64,19 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
 
 def load_files(filenames: list[str], lines: list[str]):
     for f in filenames:
-        if f.startswith("twint_out"):
+        if f.startswith("snscrape_out"):
             tag = lines[int(re.findall("\d+", f)[0])]
             tag_idx = int(re.findall("\d+", f)[0])
-            df = pd.read_csv(f, sep=",", usecols=["date", "tweet", "language"])
-            df = df.loc[df["language"] == "en"].copy()
-            df.drop("language", axis=1, inplace=True)
+
+            # df = pd.read_csv(f, sep=",", usecols=["date", "tweet", "language"])
+            df = pd.read_json(f, lines=True)[["date", "content", "lang"]]
+            # df = df.loc[df["language"] == "en"].copy()
+            df.drop("lang", axis=1, inplace=True)
+
             df["tag"] = tag.strip("#")
             df["tag_idx"] = tag_idx
 
-            yield df
+            yield df.rename({"content": "tweet"}, axis=1)
 
 
 def clean_tweets_df(all_tweets_raw: pd.DataFrame):
@@ -88,7 +86,9 @@ def clean_tweets_df(all_tweets_raw: pd.DataFrame):
     all_tweets_raw["tweet"] = (
         all_tweets_raw["tweet"].str.encode("ascii", "ignore").str.decode("utf-8")
     )
-    all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(url_mentions, "", regex=True)
+    all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(
+        url_mentions, "", regex=True
+    )
     all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace("#", "", regex=True)
 
     return all_tweets_raw
@@ -106,7 +106,9 @@ def get_tweets_and_clean():
     logging.info(f"Starting Clean S3 upload")
     for idx in all_tweets_raw["tag_idx"].unique():
         with tempfile.TemporaryFile() as fp:
-            export = all_tweets_raw.loc[all_tweets_raw["tag_idx"] == idx, "tweet"].to_list()
+            export = all_tweets_raw.loc[
+                all_tweets_raw["tag_idx"] == idx, "tweet"
+            ].to_list()
             fp.writelines([str.encode(x + "\n") for x in export])
             fp.seek(0)
             bucket.upload_fileobj(fp, f"{today}/clean_out_{idx}.txt")

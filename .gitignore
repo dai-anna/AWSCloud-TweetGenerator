@@ -1,7 +1,9 @@
 # project specific
 .DS_Store
 env.list
-
+/*.json
+/*.jsonl
+/*.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
