@@ -1,6 +1,7 @@
 # project specific
 .DS_Store
 env.list
+*.out
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

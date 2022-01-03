@@ -14,7 +14,6 @@ logging.basicConfig(
 )
 
 today = datetime.date.today()
-# today = "2021-11-15"  # Hardcode
 
 
 ROOT_DIR = "./"
@@ -51,7 +50,6 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
             "%Y-%m-%d %H:%M:%S"
         )
         # DO NOT use c.Until. When used, returns significantly fewer tweets!!
-
 
         c.Limit = 10_000  # Limit to prevent super-long scrapes which occur for spam hashtags
 
