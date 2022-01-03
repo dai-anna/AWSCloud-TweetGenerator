@@ -35,9 +35,13 @@ test:
 docker/build-hashtags: docker/clean-hashtags
 	docker build --rm -t hashtagcollector -f Dockerfiles/Dockerfile.scrapehashtags $(HASHTAGCOLLECTOR_CONTEXT)/ 
 
-docker/build-push-hashtags: docker/clean-hashtags
+docker/build-push-hashtags: docker/clean-hashtags  # NOT in production!!!
 	docker build --rm -t $(DOCKERHUB_LOCATION_HASHTAGCOLLECTOR) -f Dockerfiles/Dockerfile.scrapehashtags $(HASHTAGCOLLECTOR_CONTEXT)/ 
 	docker push $(DOCKERHUB_LOCATION_HASHTAGCOLLECTOR)
+
+docker/build-push-aws-hashtags: docker/build-hashtags  # Production target
+	docker tag hashtagcollector 533527479286.dkr.ecr.us-east-1.amazonaws.com/dukerepo:latest
+	docker push 533527479286.dkr.ecr.us-east-1.amazonaws.com/dukerepo:latest
 
 docker/run-hashtags: docker/clean-hashtags
 	docker run -it --name hashtagcollector --env-file Dockerfiles/env.list hashtagcollector
@@ -68,14 +72,13 @@ docker/clean:
 docker/build-frontend: docker/clean-frontend
 	docker build --rm -t frontend -f Dockerfiles/Dockerfile.frontend ./scripts/
 
-docker/build-push-frontend:
+docker/build-push-frontend:  # NOT in production!!!
 	docker build --rm -t $(DOCKERHUB_LOCATION_FRONTEND) -f Dockerfiles/Dockerfile.frontend ./scripts/
 	docker push $(DOCKERHUB_LOCATION_FRONTEND)
 
-docker/build-push-gcloud-frontend: docker/build-frontend
+docker/build-push-gcloud-frontend: docker/build-frontend  # Production target
 	docker tag frontend us-east1-docker.pkg.dev/ids706-tweetbot/dukerepo/frontend
 	docker push us-east1-docker.pkg.dev/ids706-tweetbot/dukerepo/frontend
-
 
 docker/run-frontend: docker/clean-frontend
 	docker run -it --name frontend --env-file Dockerfiles/env.list -p 8080:8080 frontend

@@ -6,10 +6,10 @@ WORKDIR /app
 ENV TZ=America/New_York
 
 # install git for twint install
-RUN apt-get update --no-install-recommends\
-    && apt-get install -y --no-install-recommends git \
-    && apt-get purge -y --auto-remove \
-    && rm -rf /var/lib/apt/lists/*
+# RUN apt-get update --no-install-recommends\
+#     && apt-get install -y --no-install-recommends git \
+#     && apt-get purge -y --auto-remove \
+#     && rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements_scrapetweets.txt /app/requirements_scrapetweets.txt
 RUN pip install --no-cache-dir --upgrade pip \

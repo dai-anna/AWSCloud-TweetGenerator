@@ -1,8 +1,14 @@
 # project specific
 .DS_Store
 env.list
+<<<<<<< HEAD
 *.out
 
+=======
+/*.json
+/*.jsonl
+/*.csv
+>>>>>>> 93d8d056a2791ffd63f2cf7fba6a227bd6ac5321
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

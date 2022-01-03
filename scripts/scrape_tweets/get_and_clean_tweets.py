@@ -1,4 +1,3 @@
-import twint
 import datetime
 import os
 import boto3
@@ -6,11 +5,16 @@ import pandas as pd
 import re
 import tempfile
 import logging
+import requests
+import time
 
 logging.basicConfig(
     format="[%(levelname)s] %(asctime)s - %(message)s",
     level=logging.INFO,
-    handlers=[logging.StreamHandler(), logging.FileHandler("log_get_and_clean_tweets.log")],
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler("log_get_and_clean_tweets.log"),
+    ],
 )
 
 today = datetime.date.today()
@@ -36,43 +40,86 @@ def download_hashtag_file():
     logging.info("Hashtags fetched from S3.")
 
 
+def pull_tweets_for_hashtag(hashtag, n_tweets: int = 100):
+    """
+    Pull tweets using Twitter API.
+    IMPORTANT: Supply your own Twitter API Bearer Token as the API_TOKEN environment variable.
+    """
+
+    result_list = []
+
+    url = "https://api.twitter.com/2/tweets/search/recent"
+    headers = {
+        "Authorization": f"Bearer {os.environ['API_TOKEN']}",
+    }
+
+    params = {
+        "query": f"#{hashtag} lang:en -is:retweet",
+        "max_results": 100,  # min: 10, max: 100
+    }
+
+    ii = 0
+    n_failed = 0
+
+    while len(result_list) < n_tweets:
+        if n_failed > 5:
+            print("[ERROR] Too many failed requests. Exiting.")
+            break
+
+        print(f"[INFO] Sending request {ii}")
+        try:
+            response = requests.request("GET", url, headers=headers, params=params)
+            response_json = response.json()
+            result_list = result_list + response_json["data"]
+            params["next_token"] = response_json["meta"]["next_token"]
+            # print(
+            #     f"[INFO] Received {len(result_list)} tweets so far.\n\t--> Head: {response_json['data'][0]['text']}"
+            # )
+        except Exception as e:
+            n_failed += 1
+            print(
+                f"[ERROR] in this request. Skipping it (missing {params.get('max_results')} tweets)"
+            )
+            print(response.status_code)
+            print(response.json())
+            print(e)
+        finally:
+            ii += 1
+            time.sleep(0.2)
+
+    result_df = pd.DataFrame(result_list)
+
+    return result_df.rename({'text': 'tweet'}, axis=1)
+
 def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
+    """ Given a hashtag.txt file, scrape tweets from Twitter API and save them to a local csv. """
     with open(hashtag_file_path) as f:
         trends_ls = f.readlines()
         trends_ls = [line.rstrip() for line in trends_ls]
 
     for idx, trend in enumerate(trends_ls):
-        trend = trend.strip("#")
-        c = twint.Config()
-        c.Search = "#" + trend.strip("#").replace(" ", "")  # your search here
-        c.Lang = "en"
-        c.Since = (datetime.datetime.now() - datetime.timedelta(hours=24)).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
-        # DO NOT use c.Until. When used, returns significantly fewer tweets!!
-
-        c.Limit = 10_000  # Limit to prevent super-long scrapes which occur for spam hashtags
-
-        c.Store_csv = True
-        c.Hide_output = True
-        c.Output = f"twint_out_{idx}.csv"
+        trend = trend.strip("#").replace(" ", "")
         logging.info(f"Starting {idx}: {trend} scrape")
-        twint.run.Search(c)
-        logging.info(f"Finished {idx}: {trend} scrape")
 
+
+        result_df = pull_tweets_for_hashtag(trend, n_tweets=1000)
+        result_df.to_csv(f"apicall_output_{idx}.csv", index=False)
+
+        logging.info(f"Finished {idx}: {trend} scrape")
 
 
 ###############################################
 
 
 def load_files(filenames: list[str], lines: list[str]):
+    """ Load local files """
     for f in filenames:
-        if f.startswith("twint_out"):
+        if f.startswith("apicall_output"):
             tag = lines[int(re.findall("\d+", f)[0])]
             tag_idx = int(re.findall("\d+", f)[0])
-            df = pd.read_csv(f, sep=",", usecols=["date", "tweet", "language"])
-            df = df.loc[df["language"] == "en"].copy()
-            df.drop("language", axis=1, inplace=True)
+
+            df = pd.read_csv(f, sep=",")
+
             df["tag"] = tag.strip("#")
             df["tag_idx"] = tag_idx
 
@@ -86,7 +133,9 @@ def clean_tweets_df(all_tweets_raw: pd.DataFrame):
     all_tweets_raw["tweet"] = (
         all_tweets_raw["tweet"].str.encode("ascii", "ignore").str.decode("utf-8")
     )
-    all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(url_mentions, "", regex=True)
+    all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace(
+        url_mentions, "", regex=True
+    )
     all_tweets_raw["tweet"] = all_tweets_raw["tweet"].replace("#", "", regex=True)
 
     return all_tweets_raw
@@ -104,7 +153,9 @@ def get_tweets_and_clean():
     logging.info(f"Starting Clean S3 upload")
     for idx in all_tweets_raw["tag_idx"].unique():
         with tempfile.TemporaryFile() as fp:
-            export = all_tweets_raw.loc[all_tweets_raw["tag_idx"] == idx, "tweet"].to_list()
+            export = all_tweets_raw.loc[
+                all_tweets_raw["tag_idx"] == idx, "tweet"
+            ].to_list()
             fp.writelines([str.encode(x + "\n") for x in export])
             fp.seek(0)
             bucket.upload_fileobj(fp, f"{today}/clean_out_{idx}.txt")
