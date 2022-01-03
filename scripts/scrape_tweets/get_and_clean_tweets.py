@@ -102,7 +102,7 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         trend = trend.strip("#").replace(" ", "")
         logging.info(f"Starting {idx}: {trend} scrape")
 
-        result_df = pull_tweets_for_hashtag(trend, n_tweets=200)
+        result_df = pull_tweets_for_hashtag(trend, n_tweets=1000)
         result_df.to_csv(f"apicall_output_{idx}.csv", index=False)
 
 
