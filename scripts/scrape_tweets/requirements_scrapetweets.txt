@@ -1,5 +1,4 @@
 requests
 numpy
 pandas
-snscrape
 boto3

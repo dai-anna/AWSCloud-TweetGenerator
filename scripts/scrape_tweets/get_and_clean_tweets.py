@@ -1,4 +1,3 @@
-import snscrape
 import datetime
 import os
 import boto3
@@ -6,7 +5,8 @@ import pandas as pd
 import re
 import tempfile
 import logging
-import json
+import requests
+import time
 
 logging.basicConfig(
     format="[%(levelname)s] %(asctime)s - %(message)s",
@@ -41,7 +41,59 @@ def download_hashtag_file():
     logging.info("Hashtags fetched from S3.")
 
 
+def pull_tweets_for_hashtag(hashtag, n_tweets: int = 100):
+    """
+    Pull tweets using Twitter API.
+    IMPORTANT: Supply your own Twitter API Bearer Token as the API_TOKEN environment variable.
+    """
+
+    result_list = []
+
+    url = "https://api.twitter.com/2/tweets/search/recent"
+    headers = {
+        "Authorization": f"Bearer {os.environ['API_TOKEN']}",
+    }
+
+    params = {
+        "query": f"#{hashtag} lang:en -is:retweet",
+        "max_results": 100,  # min: 10, max: 100
+    }
+
+    ii = 0
+    n_failed = 0
+
+    while len(result_list) < n_tweets:
+        if n_failed > 5:
+            print("[ERROR] Too many failed requests. Exiting.")
+            break
+
+        print(f"[INFO] Sending request {ii}")
+        try:
+            response = requests.request("GET", url, headers=headers, params=params)
+            response_json = response.json()
+            result_list = result_list + response_json["data"]
+            params["next_token"] = response_json["meta"]["next_token"]
+            # print(
+            #     f"[INFO] Received {len(result_list)} tweets so far.\n\t--> Head: {response_json['data'][0]['text']}"
+            # )
+        except Exception as e:
+            n_failed += 1
+            print(
+                f"[ERROR] in this request. Skipping it (missing {params.get('max_results')} tweets)"
+            )
+            print(response.status_code)
+            print(response.json())
+            print(e)
+        finally:
+            ii += 1
+            time.sleep(0.2)
+
+    result_df = pd.DataFrame(result_list)
+
+    return result_df.rename({'text': 'tweet'}, axis=1)
+
 def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
+    """ Given a hashtag.txt file, scrape tweets from Twitter API and save them to a local csv. """
     with open(hashtag_file_path) as f:
         trends_ls = f.readlines()
         trends_ls = [line.rstrip() for line in trends_ls]
@@ -50,10 +102,8 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         trend = trend.strip("#").replace(" ", "")
         logging.info(f"Starting {idx}: {trend} scrape")
 
-        # snscrape needs to be executed as a CLI
-        os.system(
-            f'snscrape -n 1000 --jsonl twitter-hashtag "{trend} lang:en" > snscrape_out_{idx}.jsonl'  # these are JSON **lines**
-        )
+        result_df = pull_tweets_for_hashtag(trend, n_tweets=200)
+        result_df.to_csv(f"apicall_output_{idx}.csv", index=False)
 
 
         logging.info(f"Finished {idx}: {trend} scrape")
@@ -63,20 +113,18 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
 
 
 def load_files(filenames: list[str], lines: list[str]):
+    """ Load local files """
     for f in filenames:
-        if f.startswith("snscrape_out"):
+        if f.startswith("apicall_output"):
             tag = lines[int(re.findall("\d+", f)[0])]
             tag_idx = int(re.findall("\d+", f)[0])
 
-            # df = pd.read_csv(f, sep=",", usecols=["date", "tweet", "language"])
-            df = pd.read_json(f, lines=True)[["date", "content", "lang"]]
-            # df = df.loc[df["language"] == "en"].copy()
-            df.drop("lang", axis=1, inplace=True)
+            df = pd.read_csv(f, sep=",")
 
             df["tag"] = tag.strip("#")
             df["tag_idx"] = tag_idx
 
-            yield df.rename({"content": "tweet"}, axis=1)
+            yield df
 
 
 def clean_tweets_df(all_tweets_raw: pd.DataFrame):
