@@ -18,7 +18,7 @@ logging.basicConfig(
 )
 
 today = datetime.date.today()
-# today = "2021-11-15"  # Hardcode
+# today = "2022-01-03"  # Hardcode
 
 
 ROOT_DIR = "./"
@@ -55,7 +55,7 @@ def pull_tweets_for_hashtag(hashtag, n_tweets: int = 100):
     }
 
     params = {
-        "query": f"#{hashtag} lang:en -is:retweet",
+        "query": f"{hashtag} lang:en -is:retweet",
         "max_results": 100,  # min: 10, max: 100
     }
 
@@ -99,7 +99,7 @@ def scrape_tweets_from_hashtags(hashtag_file_path: str = "hashtags.txt"):
         trends_ls = [line.rstrip() for line in trends_ls]
 
     for idx, trend in enumerate(trends_ls):
-        trend = trend.strip("#").replace(" ", "")
+        trend = trend.lower()  # .strip("#").replace(" ", "")  # lets keep spaces
         logging.info(f"Starting {idx}: {trend} scrape")
 
         result_df = pull_tweets_for_hashtag(trend, n_tweets=1000)
