@@ -107,7 +107,7 @@ class IacStack(cdk.Stack):
             availability_zones=["*"],
             # availability_zones = [i.availability_zone for i in vpc.public_subnets],
             vpc_id="vpc-063358bf08a40ecde",
-            public_subnet_ids = ["subnet-04cfd2562ad030a43"]
+            public_subnet_ids = ["subnet-04cfd2562ad030a43"],
             # public_subnet_ids=[i.subnet_id for i in vpc.public_subnets],
         )
         # i_vpc_default = aws_ec2.Vpc.from_lookup(
@@ -147,10 +147,10 @@ class IacStack(cdk.Stack):
                 ),
             ),
             environment={
+                "BUCKET_NAME": bucket.bucket_name,
                 "API_TOKEN": os.getenv("API_TOKEN"),
                 "ACCESS_KEY_ID": os.getenv("ACCESS_KEY_ID"),
                 "SECRET_ACCESS_KEY": os.getenv("SECRET_ACCESS_KEY"),
-                "BUCKET_NAME": bucket.bucket_name,
             },
         )
 
